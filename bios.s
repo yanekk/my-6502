@@ -1,0 +1,24 @@
+  .INCLUDE "cfcard/cfcard.h"
+
+CFSECT_BUFF_FIRST_HALF .EQU $0200 
+CFSECT_BUFF_SECOND_HALF .EQU CFSECT_BUFF_FIRST_HALF + $FF
+
+  .ORG $8000  
+  .INCLUDE "cfcard/cfcard.s"
+  
+reset: 
+  JSR CF_INIT
+  
+  LDA #$3
+  STA CFLBA0_BUFF
+  LDA #$0
+  STA CFLBA1_BUFF
+  LDA #$0
+  STA CFLBA2_BUFF
+  JSR CF_READ_SECTOR
+  
+  JMP CFSECT_BUFF_FIRST_HALF
+  
+  .org $fffc
+  .word reset
+  .word $0000
