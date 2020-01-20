@@ -1,2 +1,2 @@
 cd ..
-vasm6502_oldstyle -Fbin -Ilib -dotdir -o bin\program.bin program.s
+vasm6502_oldstyle -Fbin -esc -Ilib -dotdir -o bin\program.bin program.s
