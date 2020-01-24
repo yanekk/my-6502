@@ -1,18 +1,24 @@
 ; general equates
-LCD_COMMAND .equ $00 ; 00000000
-LCD_CHAR    .equ $01 ; 00000001
+LCD_COMMAND = $00 ; 00000000
+LCD_CHAR    = $01 ; 00000001
 
-LCD_ENABLE  .equ $04 ; 00000100
+LCD_ENABLE = $04 ; 00000100
 
-LCD_FUNCTION_SET      .equ $3b ; 00111011
-LCD_CMD_DISPLAY_ON    .equ $0c ; 00001100
-LCD_CMD_DISPLAY_CLEAR .equ $01 ; 00000001
-LCD_ENTRYMODE_SET     .equ $06 ; 00000110
+LCD_FUNCTION_SET       = $3b ; 00111011
+LCD_CMD_DISPLAY_ON     = $0c ; 00001100
+LCD_CMD_DISPLAY_CLEAR  = $01 ; 00000001
+LCD_ENTRYMODE_SET      = $06 ; 00000110
 
 ; variables
 write_line_pointer = $00
 
 lcd_initialize:
+  LDA #$ff       ; set all LCD 
+  STA VIA_DDRA   ; data lines to output
+  
+  LDA #$07       ; set first three B lines to output
+  STA VIA_DDRB   ; set all B lines to output
+
   LDA #$70 ; wait 101ms
   JSR wait
   
@@ -73,15 +79,15 @@ lcd_write_line:
   STX write_line_pointer+1
   
   LDY #$00
-.write_next_line1_char:
+@write_next_line1_char:
   LDA (write_line_pointer), Y
   TAX
   CPX #$00
-  BEQ .write_line_return
+  BEQ @write_line_return
   JSR lcd_write_char
   INY
-  JMP .write_next_line1_char
-.write_line_return:
+  JMP @write_next_line1_char
+@write_line_return:
   RTS
   
 lcd_write_char:

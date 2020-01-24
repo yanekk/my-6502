@@ -26,17 +26,17 @@ acia_write_line:
   STX acia_write_line_pointer+1
   LDY #0
 
-.acia_write_next_char:
-.acia_wait_for_txd_empty:
+@acia_write_next_char:
+@acia_wait_for_txd_empty:
   JSR acia_wait_for_txd_empty
   LDA (acia_write_line_pointer), Y
-  BEQ .acia_write_line_end
+  BEQ @acia_write_line_end
   STA ACIA_DATA
   INY
   LDA #1
   JSR wait
-  JMP .acia_write_next_char
-.acia_write_line_end:
+  JMP @acia_write_next_char
+@acia_write_line_end:
   RTS
 
 acia_wait_for_txd_empty:

@@ -5,19 +5,19 @@ wait:
   PHA
   TXA
   PHA
-.wait_milisecond:
+@wait_milisecond:
   LDX #$7F
-.wait_some_more:
+@wait_some_more:
   DEX
   CPX #$0
-  BNE .wait_some_more
+  BNE @wait_some_more
   LDX WAIT_TIME
   DEX
   CPX #$0
-  BEQ .end_wait
+  BEQ @end_wait
   STX WAIT_TIME
-  JMP .wait_milisecond
-.end_wait:
+  JMP @wait_milisecond
+@end_wait:
   PLA
   TAX
   PLA
