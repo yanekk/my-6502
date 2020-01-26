@@ -5,15 +5,16 @@ ptr1_h = $FF
   .include "via/via.h"
   .include "lcd/lcd.h"
   .include "acia/acia.h"
+  .include "bios.h"
 
-CFSECT_BUFF_FIRST_HALF  = $3e00 
-CFSECT_BUFF_SECOND_HALF = CFSECT_BUFF_FIRST_HALF + $FF
+INIT  = $3e00 
 
   .segment "CODE"
-  .include "cfcard/cfcard.s"
   .include "lcd/lcd.s"
   .include "utils/wait.s"
   .include "acia/acia.s"
+  .include "utils/macros.s"
+  .include "cfcard/cfcard.s"
   
   .segment "CODE"
 reset: 
@@ -25,9 +26,11 @@ reset:
   STA CFLBA1_BUFF
   LDA #$0
   STA CFLBA2_BUFF
+  LDX #<INIT
+  LDY #>INIT
   JSR CF_READ_SECTOR
-  
-  JMP CFSECT_BUFF_FIRST_HALF
+
+  JMP INIT
   
   .segment "API"
 call_subroutine:

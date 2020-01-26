@@ -13,3 +13,6 @@ CFCMD   = CFBASE + $07		; Command (W)
 CFLBA0_BUFF = $00
 CFLBA1_BUFF = $01
 CFLBA2_BUFF = $02
+CFSECCO_BUFF = $03
+cf_store_address = $04
+cf_store_address_h = $05

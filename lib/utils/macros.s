@@ -5,8 +5,10 @@
 .endmacro
 
 .macro call subroutine_name
+  PHY
   LDY #subroutine_name
-  JSR call_subroutine
+  JSR sub_call_subroutine
+  PLY
 .endmacro
 
 .macro copy_pointer source, destination

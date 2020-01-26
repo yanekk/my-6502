@@ -17,8 +17,10 @@ acia_write_char:
   JSR acia_wait_for_txd_empty
   PLA
   STA ACIA_DATA
+  PHA
   LDA #1
   JSR wait
+  PLA
   RTS
 
 acia_write_line:

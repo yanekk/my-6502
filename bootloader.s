@@ -1,35 +1,36 @@
-  .INCLUDE "dotmatrix/dotmatrix.h"
+  .include "cfcard/cfcard.h"
+  .include "utils/macros.s"
   .INCLUDE "bios.h"
-
   .ORG $3e00
-  
+
 init:
-  ;LDY #lcd_initialize
-  ;JSR call_subroutine
+  call sub_acia_initialize
+  call sub_lcd_initialize
+  call sub_lcd_clear
+  call sub_acia_initialize
 
-  ;LDY #lcd_clear
-  ;JSR call_subroutine
+  LDA #<loading
+  LDX #>loading
+  call sub_lcd_write_line
 
-  ;LDA #<line1
-  ;LDX #>line1
-  ;LDY #lcd_write_line
-  ;JSR call_subroutine
-
-  ;LDY #acia_initialize
-  ;JSR call_subroutine
-
-  ;LDA #<acia_initialized
-  ;LDX #>acia_initialized
-  ;LDY #acia_write_line
-  ;JSR call_subroutine
-
-  JSR dotmatrix_initialize
-  JSR dotmatrix_splash
+  LDA #'0'
+  call sub_acia_write_char
   
-do_nothing:
-  NOP
-  JMP do_nothing
-  .INCLUDE "dotmatrix/dotmatrix.s"
-  
-;line1: .ASCIIZ "Sending data..."
-;acia_initialized: .ASCIIZ "ACIA initialized.\r\n"
+  LDA #$2
+  STA CFSECCO_BUFF
+  LDA #$4
+  STA CFLBA0_BUFF
+  LDA #$0
+  STA CFLBA1_BUFF
+  LDA #$0
+  STA CFLBA2_BUFF
+  LDX #<$0200
+  LDY #>$0200
+  JSR CF_READ_SECTOR
+
+  call sub_lcd_clear
+
+  JMP $0200
+
+  .include "cfcard/cfcard.s"
+loading: .ASCIIZ "Loading..."

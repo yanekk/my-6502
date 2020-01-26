@@ -41,56 +41,71 @@ LOOP_DAT_RDY:
   CMP #$0
   BNE LOOP_DAT_RDY
   RTS
-  
+
+CF_INC_STORE_ADDRESS:
+  INC cf_store_address
+  BNE @CF_INC_STORE_ADDRESS_E
+  INC cf_store_address+1
+@CF_INC_STORE_ADDRESS_E:
+  RTS
+
 CF_RD_CMD:
   PHA
   JSR LOOP_CMD_RDY				;Make sure drive is ready for command
-  PLA						;Prepare read command
-  STA CFCMD					;Send read command
+  PLA         						;Prepare read command
+  LDA #$20                ; Read command
+  STA CFCMD			       		;Send read command
   JSR LOOP_DAT_RDY				;Wait until data is ready to be read
-  LDA CFSTAT					;Read status
-  AND #$1					;mask off error bit
+  LDA CFSTAT					    ;Read status
+  AND #$1					        ;mask off error bit
   CMP #$0
   BNE CF_RD_CMD
-  LDX #$0
-@CF_RD_SECT_FIRST_HALF:
-  JSR LOOP_DAT_RDY	
+
+  JSR LOOP_DAT_RDY
+@CF_RD_BYTE:
   LDA CFDATA
-  STA CFSECT_BUFF_FIRST_HALF, X
-  INX
-  CPX #$FF
-  BNE @CF_RD_SECT_FIRST_HALF
-  LDX #$0
-@CF_RD_SECT_SECOND_HALF:
-  JSR LOOP_DAT_RDY	
-  LDA CFDATA
-  STA CFSECT_BUFF_SECOND_HALF, X
-  INX
-  CPX #$FF
-  BNE @CF_RD_SECT_SECOND_HALF
+  ;call sub_acia_write_char
+  LDY #0
+  STA (cf_store_address), Y
+  JSR CF_INC_STORE_ADDRESS
+
+  LDA CFSTAT     ; Read status				
+  AND #$8  ; mask off drq bits
+  CMP #$8
+  BEQ @CF_RD_BYTE
   RTS
 
 CF_READ_SECTOR:
-  LDA #$01
+  STX cf_store_address
+  STY cf_store_address_h
+
+  LDA CFSECCO_BUFF
   STA CFSECCO   ; Deal with only one sector at a time (512 bytes)
+  
   JSR LOOP_BUSY
 
+  LDA #$0A
+  call sub_acia_write_char
+
   LDA CFLBA0_BUFF
-  STA CFLBA0    ; LBA 0:7
+  STA CFLBA0    ; LBA 0:7 
+  call sub_acia_write_char
   JSR LOOP_BUSY
 
   LDA CFLBA1_BUFF
   STA CFLBA1    ; LBA 8:15
+  call sub_acia_write_char
   JSR LOOP_BUSY
 
   LDA CFLBA2_BUFF
   STA CFLBA2 ;LBA 16:23
+  call sub_acia_write_char
   JSR LOOP_BUSY
 
   LDA #$E0    ; Selects CF as master
   STA CFLBA3 ; LBA 24:27 + DRV 0 selected + bits 5:7=111
+  call sub_acia_write_char
   JSR LOOP_BUSY
 
-  LDA #$20 ; Read command
   JSR CF_RD_CMD
   RTS

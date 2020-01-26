@@ -4,6 +4,7 @@ import msvcrt
 import win32file
 import winioctlcon
 import contextlib
+import math
 
 @contextlib.contextmanager
 def lock_volume(vol):
@@ -21,12 +22,14 @@ def lock_volume(vol):
                                       None, None)
 
 sectorSize = 512
-sectorNo = 3
+sectorNo = int(sys.argv[2])
 driveNumber = 2
 
 file = open(sys.argv[1], "rb")
 contents = file.read()
-data = bytearray(sectorSize)
+fileSize = os.stat(sys.argv[1]).st_size
+dataSize = math.ceil(fileSize/sectorSize) * sectorSize
+data = bytearray(dataSize)
 
 for i in range(len(contents)):
   data[i] = contents[i]
