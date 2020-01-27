@@ -3,6 +3,9 @@
   .INCLUDE "utils/macros.s"
 
   .ORG $0200
+
+shift_line = $11
+
 init:
   ;LDY #lcd_initialize
   ;JSR call_subroutine
@@ -23,17 +26,25 @@ init:
   ;JSR call_subroutine
 
   JSR dotmatrix_initialize
-splash:
-  LDA #$FF
-  JSR dotmatrix_clear
-  LDA #60
-  call sub_wait
 
-  ;LDA #$00
-  JSR dotmatrix_splash
-  LDA #60
+  LDA #$00
+  JSR dotmatrix_clear
+  LDA #30
   call sub_wait
   
+reset_shift_line:
+  LDA #64
+  STA shift_line
+splash:
+  JSR dotmatrix_splash
+  DEC shift_line
+
+  LDA #32
+  call sub_wait
+
+  LDA shift_line
+  CMP #0
+  BEQ reset_shift_line
   JMP splash
 
 do_nothing:
