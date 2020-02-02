@@ -29,8 +29,7 @@ init:
 
   LDA #$00
   JSR dotmatrix_clear
-  LDA #30
-  call sub_wait
+  JSR dotmatrix_splash_initialize
   
 reset_shift_line:
   LDA #64

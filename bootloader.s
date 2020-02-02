@@ -13,9 +13,6 @@ init:
   LDX #>loading
   call sub_lcd_write_line
 
-  LDA #'0'
-  call sub_acia_write_char
-  
   LDA #$2
   STA CFSECCO_BUFF
   LDA #$4
