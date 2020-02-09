@@ -64,7 +64,6 @@ CF_RD_CMD:
   JSR LOOP_DAT_RDY
 @CF_RD_BYTE:
   LDA CFDATA
-  ;call sub_acia_write_char
   LDY #0
   STA (cf_store_address), Y
   JSR CF_INC_STORE_ADDRESS
@@ -84,27 +83,21 @@ CF_READ_SECTOR:
   
   JSR LOOP_BUSY
 
-  LDA #$0A
-  call sub_acia_write_char
 
   LDA CFLBA0_BUFF
   STA CFLBA0    ; LBA 0:7 
-  call sub_acia_write_char
   JSR LOOP_BUSY
 
   LDA CFLBA1_BUFF
   STA CFLBA1    ; LBA 8:15
-  call sub_acia_write_char
   JSR LOOP_BUSY
 
   LDA CFLBA2_BUFF
   STA CFLBA2 ;LBA 16:23
-  call sub_acia_write_char
   JSR LOOP_BUSY
 
   LDA #$E0    ; Selects CF as master
   STA CFLBA3 ; LBA 24:27 + DRV 0 selected + bits 5:7=111
-  call sub_acia_write_char
   JSR LOOP_BUSY
 
   JSR CF_RD_CMD

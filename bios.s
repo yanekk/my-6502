@@ -1,3 +1,5 @@
+interrupt_timeout = $FD
+
 ptr1 = $FE
 ptr1_h = $FF
 
@@ -17,9 +19,17 @@ INIT  = $3e00
   .include "cfcard/cfcard.s"
   
   .segment "CODE"
-reset: 
+reset:
+  LDA #0
+  STA interrupt_timeout
+
+  call sub_lcd_initialize
+  call sub_lcd_clear
+
   JSR CF_INIT
-  
+
+  LDA #$1
+  STA CFSECCO_BUFF
   LDA #$3
   STA CFLBA0_BUFF
   LDA #$0
@@ -31,7 +41,13 @@ reset:
   JSR CF_READ_SECTOR
 
   JMP INIT
-  
+
+irq_handler:
+  LDA #1
+  STA interrupt_timeout
+  BIT VIA_T1CL
+  RTI
+
   .segment "API"
 call_subroutine:
   PHA
@@ -41,6 +57,7 @@ call_subroutine:
   STA ptr1_h
   PLA
   JMP (ptr1)
+
 funcs_low:
   .byte <lcd_initialize, <lcd_clear, <lcd_write_line, <wait, <acia_initialize, <acia_write_char, <acia_write_line
 funcs_high:
@@ -48,4 +65,4 @@ funcs_high:
 
   .segment "INIT" 
   .word reset
-  .word $0000
+  .word irq_handler

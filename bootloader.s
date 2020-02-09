@@ -7,7 +7,6 @@ init:
   call sub_acia_initialize
   call sub_lcd_initialize
   call sub_lcd_clear
-  call sub_acia_initialize
 
   LDA #<loading
   LDX #>loading
