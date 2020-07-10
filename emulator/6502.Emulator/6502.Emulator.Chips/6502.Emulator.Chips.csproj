@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RootNamespace>_6502.Emulator.Chips</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\6502.Emulator.Abstract\6502.Emulator.Abstract.csproj" />
+  </ItemGroup>
+
+</Project>

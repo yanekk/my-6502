@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "6502.Emulator", "6502.Emulator\6502.Emulator.csproj", "{0FDDBF15-EB79-48F3-A6BC-D5160D8CBAFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E5A552D1-5574-490B-9186-9F7F339E1155}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "6502.Emulator.Abstract", "6502.Emulator.Abstract\6502.Emulator.Abstract.csproj", "{1C5D9D24-961D-46BB-AB9A-489CF32C366F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "6502.Emulator.Chips", "6502.Emulator.Chips\6502.Emulator.Chips.csproj", "{2EF549E1-CEAC-477D-8AA9-0F06327FED63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "6502.Emulator.Chips.Tests", "6502.Emulator.Chips.Tests\6502.Emulator.Chips.Tests.csproj", "{00F1CEBF-14C0-497F-A673-BFDD2B03D58C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "6502.Emulator.Processor", "6502.Emulator.Processor\6502.Emulator.Processor.csproj", "{E1E2FB1D-77CC-4B89-BD10-DA5E59830AD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "6502.Emulator.Processor.Tests", "6502.Emulator.Processor.Tests\6502.Emulator.Processor.Tests.csproj", "{9382F85D-68D5-431C-8EEA-1494874DA2C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FDDBF15-EB79-48F3-A6BC-D5160D8CBAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FDDBF15-EB79-48F3-A6BC-D5160D8CBAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FDDBF15-EB79-48F3-A6BC-D5160D8CBAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FDDBF15-EB79-48F3-A6BC-D5160D8CBAFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C5D9D24-961D-46BB-AB9A-489CF32C366F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C5D9D24-961D-46BB-AB9A-489CF32C366F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C5D9D24-961D-46BB-AB9A-489CF32C366F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C5D9D24-961D-46BB-AB9A-489CF32C366F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EF549E1-CEAC-477D-8AA9-0F06327FED63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EF549E1-CEAC-477D-8AA9-0F06327FED63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EF549E1-CEAC-477D-8AA9-0F06327FED63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EF549E1-CEAC-477D-8AA9-0F06327FED63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00F1CEBF-14C0-497F-A673-BFDD2B03D58C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00F1CEBF-14C0-497F-A673-BFDD2B03D58C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00F1CEBF-14C0-497F-A673-BFDD2B03D58C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00F1CEBF-14C0-497F-A673-BFDD2B03D58C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1E2FB1D-77CC-4B89-BD10-DA5E59830AD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1E2FB1D-77CC-4B89-BD10-DA5E59830AD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1E2FB1D-77CC-4B89-BD10-DA5E59830AD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1E2FB1D-77CC-4B89-BD10-DA5E59830AD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9382F85D-68D5-431C-8EEA-1494874DA2C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9382F85D-68D5-431C-8EEA-1494874DA2C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9382F85D-68D5-431C-8EEA-1494874DA2C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9382F85D-68D5-431C-8EEA-1494874DA2C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{00F1CEBF-14C0-497F-A673-BFDD2B03D58C} = {E5A552D1-5574-490B-9186-9F7F339E1155}
+		{9382F85D-68D5-431C-8EEA-1494874DA2C5} = {E5A552D1-5574-490B-9186-9F7F339E1155}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AACD170F-4CF4-4B6B-9FD8-F3B1337A2172}
+	EndGlobalSection
+EndGlobal
