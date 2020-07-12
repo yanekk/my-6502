@@ -11,77 +11,83 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void CLV()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.CLV, 0x2A);
+                .WithInternalState(overflowFlag: true)
+                .WithMemoryChip((int)OpCode.CLV);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            OverflowFlag().Should().BeFalse();
         }
 
         [Test]
         public void SEI()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.SEI, 0x2A);
+                .WithInternalState(interruptDisableFlag: false)
+                .WithMemoryChip((int)OpCode.SEI);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            InterrupDisableFlag().Should().BeTrue();
         }
 
         [Test]
         public void CLI()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.CLI, 0x2A);
+                .WithInternalState(interruptDisableFlag: true)
+                .WithMemoryChip((int)OpCode.CLI);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            InterrupDisableFlag().Should().BeFalse();
         }
 
         [Test]
         public void SED()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.SED, 0x2A);
+                .WithInternalState(decimalFlag: false)
+                .WithMemoryChip((int)OpCode.SED);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            DecimalFlag().Should().BeTrue();
         }
 
         [Test]
         public void CLD()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.CLD, 0x2A);
+                .WithInternalState(decimalFlag: true)
+                .WithMemoryChip((int)OpCode.CLD);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            DecimalFlag().Should().BeFalse();
         }
 
         [Test]
         public void SEC()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.SEC, 0x2A);
+                .WithInternalState(carryFlag: false)
+                .WithMemoryChip((int)OpCode.SEC);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            CarryFlag().Should().BeTrue();
         }
 
         [Test]
         public void CLC()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.CLC, 0x2A);
+                .WithInternalState(carryFlag: true)
+                .WithMemoryChip((int)OpCode.CLC);
 
             TickOnce();
-
-            RegisterA().Should().Be(0x2A);
+            CarryFlag().Should().BeFalse();
         }
     }
 }

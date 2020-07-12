@@ -2,8 +2,8 @@
 {
     public enum OpCode
     {
-        BRK  = 0x00,
-        JSR = 0x10,
+        BRK = 0x00,
+        JSR = 0x20,
 
         ADC_Immediate = 0x69,
         ADC_ZeroPage = 0x65,

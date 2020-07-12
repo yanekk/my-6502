@@ -10,39 +10,43 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void TAX()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.TAX, 0x2A);
+                .WithInternalState(a: 0x2A)
+                .WithMemoryChip(0x0000, (int)OpCode.TAX);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            RegisterX().Should().Be(0x2A);
         }
 
         [Test]
         public void TAY()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.TAY, 0x2A);
+                .WithInternalState(a: 0x2A)
+                .WithMemoryChip(0x0000, (int)OpCode.TAY);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            RegisterY().Should().Be(0x2A);
         }
 
         [Test]
         public void TSX()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.TSX, 0x2A);
+                .WithInternalState(stackPointer: 0x2A)
+                .WithMemoryChip(0x0000, (int)OpCode.TSX);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            RegisterX().Should().Be(0x2A);
         }
 
         [Test]
         public void TXA()
         {
             HavingProcessor()
+                .WithInternalState(x: 0x2A)
                 .WithMemoryChip(0x0000, (int)OpCode.TXA, 0x2A);
 
             TickOnce();
@@ -54,17 +58,19 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void TXS()
         {
             HavingProcessor()
+                .WithInternalState(x: 0x2A)
                 .WithMemoryChip(0x0000, (int)OpCode.TXS, 0x2A);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            StackPointer().Should().Be(0x2A);
         }
 
         [Test]
         public void TYA()
         {
             HavingProcessor()
+                .WithInternalState(y: 0x2A)
                 .WithMemoryChip(0x0000, (int)OpCode.TYA, 0x2A);
 
             TickOnce();

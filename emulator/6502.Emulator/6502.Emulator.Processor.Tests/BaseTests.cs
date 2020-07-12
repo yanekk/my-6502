@@ -55,5 +55,30 @@ namespace _6502.Emulator.Processor.Tests
         {
             return _processor.GetInternalState().RegisterY;
         }
+
+        protected byte StackPointer()
+        {
+            return _processor.GetInternalState().StackPointer;
+        }
+
+        protected bool CarryFlag()
+        {
+            return _processor.GetInternalState().CarryFlag;
+        }
+
+        protected bool DecimalFlag()
+        {
+            return _processor.GetInternalState().DecimalFlag;
+        }
+
+        protected bool InterrupDisableFlag()
+        {
+            return _processor.GetInternalState().InterruptDisableFlag;
+        }
+
+        protected bool OverflowFlag()
+        {
+            return _processor.GetInternalState().OverflowFlag;
+        }
     }
 }
