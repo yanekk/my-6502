@@ -23,7 +23,7 @@
         AND_ZeroPageIndirectX = 0x21,
         AND_ZeroPageYIndirect = 0x31,
 
-        ASL_Accumulator = 0x0A,
+        ASL = 0x0A,
         ASL_ZeroPage = 0x06,
         ASL_ZeroPageX = 0x16,
         ASL_Absolute = 0x0E,
@@ -112,7 +112,7 @@
         LDY_Absolute = 0xAC,
         LDY_AbsoluteX = 0xBC,
 
-        LSR_Accumulator = 0x4A,
+        LSR = 0x4A,
         LSR_ZeroPage = 0x46,
         LSR_ZeroPageX = 0x56,
         LSR_Absolute = 0x4E,
@@ -135,13 +135,13 @@
         PHP = 0x08,
         PLP = 0x28,
 
-        ROL_Accumulator = 0x2A,
+        ROL = 0x2A,
         ROL_ZeroPage = 0x26,
         ROL_ZeroPageX = 0x36,
         ROL_Absolute = 0x2E,
         ROL_AbsoluteX = 0x3E,
 
-        ROR_Accumulator = 0x6A,
+        ROR = 0x6A,
         ROR_ZeroPage = 0x66,
         ROR_ZeroPageX = 0x76,
         ROR_Absolute = 0x6E,
@@ -176,7 +176,7 @@
         STX_Absolute = 0x8E,
 
         STY_ZeroPage = 0x84,
-        STY_ZeroPageY = 0x94,
+        STY_ZeroPageX = 0x94,
         STY_Absolute = 0x8C,
 
         TAX = 0xAA,

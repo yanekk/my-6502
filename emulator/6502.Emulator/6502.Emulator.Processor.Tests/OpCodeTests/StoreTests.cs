@@ -5,25 +5,14 @@ using NUnit.Framework;
 namespace _6502.Emulator.Processor.Tests.OpCodeTests
 {
     [TestFixture]
-    internal class LoadTests : BaseTests
+    internal class StoreTests : BaseTests
     {
         [Test]
-        public void LDA_Immediate()
-        {
-            HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.LDA_Immediate, 0x2A);
-
-            TickOnce();
-
-            RegisterA().Should().Be(0x2A);
-        }
-
-        [Test]
-        public void LDA_ZeroPage()
+        public void STA_ZeroPage()
         {
             HavingProcessor(0x1000)
                 .WithMemoryChip(0x0000, AnyByte, 0x2A)
-                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPage, 1);
+                .WithMemoryChip(0x1000, (int)OpCode.STA_ZeroPage, 1);
 
             TickOnce();
 
@@ -31,12 +20,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDA_ZeroPageX()
+        public void STA_ZeroPageX()
         {
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
                 .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
-                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPageX, 0x01);
+                .WithMemoryChip(0x1000, (int)OpCode.STA_ZeroPageX, 0x01);
 
             TickOnce();
 
@@ -44,10 +33,10 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDA_Absolute()
+        public void STA_Absolute()
         {
             HavingProcessor(0x1000)
-                .WithMemoryChip(0x1000, (int)OpCode.LDA_Absolute, 0x01, 0x20)
+                .WithMemoryChip(0x1000, (int)OpCode.STA_Absolute, 0x01, 0x20)
                 .WithMemoryChip(0x2000, AnyByte, 0x2A);
 
             TickOnce();
@@ -56,11 +45,11 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDA_AbsoluteX()
+        public void STA_AbsoluteX()
         {
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
-                .WithMemoryChip(0x1000, (int)OpCode.LDA_AbsoluteX, 0x01, 0x20)
+                .WithMemoryChip(0x1000, (int)OpCode.STA_AbsoluteX, 0x01, 0x20)
                 .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
 
             TickOnce();
@@ -69,11 +58,11 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDA_AbsoluteY()
+        public void STA_AbsoluteY()
         {
             HavingProcessor(0x1000)
                 .WithInternalState(y: 0x01)
-                .WithMemoryChip(0x1000, (int)OpCode.LDA_AbsoluteY, 0x01, 0x20)
+                .WithMemoryChip(0x1000, (int)OpCode.STA_AbsoluteY, 0x01, 0x20)
                 .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
 
             TickOnce();
@@ -82,12 +71,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDA_IndirectX()
+        public void STA_IndirectX()
         {
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
                 .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x01, 0x20)
-                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPageIndirectX, 0x01)
+                .WithMemoryChip(0x1000, (int)OpCode.STA_ZeroPageIndirectX, 0x01)
                 .WithMemoryChip(0x2000, AnyByte, 0x2A);
 
             TickOnce();
@@ -96,12 +85,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDA_IndirectY()
+        public void STA_IndirectY()
         {
             HavingProcessor(0x1000)
                 .WithInternalState(y: 0x01)
                 .WithMemoryChip(0x0000, AnyByte, 0x01, 0x20)
-                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPageYIndirect, 0x01)
+                .WithMemoryChip(0x1000, (int)OpCode.STA_ZeroPageYIndirect, 0x01)
                 .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
 
             TickOnce();
@@ -110,22 +99,11 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDX_Immediate()
-        {
-            HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.LDX_Immediate, 0x2A);
-
-            TickOnce();
-
-            RegisterX().Should().Be(0x2A);
-        }
-
-        [Test]
-        public void LDX_ZeroPage()
+        public void STX_ZeroPage()
         {
             HavingProcessor(0x1000)
                 .WithMemoryChip(0x0000, AnyByte, 0x2A)
-                .WithMemoryChip(0x1000, (int)OpCode.LDX_ZeroPage, 1);
+                .WithMemoryChip(0x1000, (int)OpCode.STX_ZeroPage, 1);
 
             TickOnce();
 
@@ -133,12 +111,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDX_ZeroPageY()
+        public void STX_ZeroPageY()
         {
             HavingProcessor(0x1000)
                 .WithInternalState(y: 0x01)
                 .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
-                .WithMemoryChip(0x1000, (int)OpCode.LDX_ZeroPageY, 0x01);
+                .WithMemoryChip(0x1000, (int)OpCode.STX_ZeroPageY, 0x01);
 
             TickOnce();
 
@@ -146,23 +124,10 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDX_AbsoluteY()
+        public void STX_Absolute()
         {
             HavingProcessor(0x1000)
-                .WithInternalState(y: 0x01)
-                .WithMemoryChip(0x1000, (int)OpCode.LDX_AbsoluteY, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
-
-            TickOnce();
-
-            RegisterX().Should().Be(0x2A);
-        }
-
-        [Test]
-        public void LDX_Absolute()
-        {
-            HavingProcessor(0x1000)
-                .WithMemoryChip(0x1000, (int)OpCode.LDX_Absolute, 0x01, 0x20)
+                .WithMemoryChip(0x1000, (int)OpCode.STX_Absolute, 0x01, 0x20)
                 .WithMemoryChip(0x2000, AnyByte, 0x2A);
 
             TickOnce();
@@ -170,23 +135,13 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
             RegisterX().Should().Be(0x2A);
         }
 
-        [Test]
-        public void LDY_Immediate()
-        {
-            HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.LDY_Immediate, 0x2A);
-
-            TickOnce();
-
-            RegisterY().Should().Be(0x2A);
-        }
 
         [Test]
-        public void LDY_ZeroPage()
+        public void STY_ZeroPage()
         {
             HavingProcessor(0x1000)
                 .WithMemoryChip(0x0000, AnyByte, 0x2A)
-                .WithMemoryChip(0x1000, (int)OpCode.LDY_ZeroPage, 1);
+                .WithMemoryChip(0x1000, (int)OpCode.STY_ZeroPage, 1);
 
             TickOnce();
 
@@ -194,12 +149,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDY_ZeroPageX()
+        public void STY_ZeroPageX()
         {
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
                 .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
-                .WithMemoryChip(0x1000, (int)OpCode.LDY_ZeroPageX, 0x01);
+                .WithMemoryChip(0x1000, (int)OpCode.STY_ZeroPageX, 0x01);
 
             TickOnce();
 
@@ -207,24 +162,11 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
-        public void LDY_Absolute()
+        public void STY_Absolute()
         {
             HavingProcessor(0x1000)
-                .WithMemoryChip(0x1000, (int)OpCode.LDY_Absolute, 0x01, 0x20)
+                .WithMemoryChip(0x1000, (int)OpCode.STY_Absolute, 0x01, 0x20)
                 .WithMemoryChip(0x2000, AnyByte, 0x2A);
-
-            TickOnce();
-
-            RegisterY().Should().Be(0x2A);
-        }
-
-        [Test]
-        public void LDY_AbsoluteX()
-        {
-            HavingProcessor(0x1000)
-                .WithInternalState(x: 0x01)
-                .WithMemoryChip(0x1000, (int)OpCode.LDY_AbsoluteX, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
 
             TickOnce();
 
