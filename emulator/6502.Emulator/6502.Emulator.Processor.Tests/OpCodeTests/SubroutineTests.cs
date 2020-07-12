@@ -8,6 +8,17 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
     internal class SubroutineTests : BaseTests
     {
         [Test]
+        public void BRK()
+        {
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.BRK, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
         public void JSR()
         {
             HavingProcessor()

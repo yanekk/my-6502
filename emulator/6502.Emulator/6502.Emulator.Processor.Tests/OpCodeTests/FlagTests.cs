@@ -8,10 +8,32 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
     internal class FlagTests : BaseTests
     {
         [Test]
+        public void CLV()
+        {
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.CLV, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
         public void SEI()
         {
             HavingProcessor()
                 .WithMemoryChip(0x0000, (int)OpCode.SEI, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void CLI()
+        {
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.CLI, 0x2A);
 
             TickOnce();
 
@@ -30,10 +52,32 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         }
 
         [Test]
+        public void CLD()
+        {
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.CLD, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
         public void SEC()
         {
             HavingProcessor()
                 .WithMemoryChip(0x0000, (int)OpCode.SEC, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void CLC()
+        {
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.CLC, 0x2A);
 
             TickOnce();
 
