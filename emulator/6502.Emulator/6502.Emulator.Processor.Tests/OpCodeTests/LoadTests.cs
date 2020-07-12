@@ -1,168 +1,234 @@
-﻿using _6502.Emulator.Processor.Tests.TestDoubles;
+﻿using _6502.Emulator.Processor.Tests.Extensions;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace _6502.Emulator.Processor.Tests
 {
     [TestFixture]
-    public class LoadTests
+    internal class LoadTests : BaseTests
     {
-        private TestClock _testClock;
-
-        [SetUp]
-        public void SetupClock()
-        {
-            _testClock = new TestClock();
-        }
-
         [Test]
         public void LDA_Immediate()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor()
-                .AddChip(0x0000, new TestMemoryChip((int)OpCode.LDAi, expectedRegisterValue));
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.LDA_Immediate, 0x2A);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterA);
+            RegisterA().Should().Be(0x2A);
         }
 
         [Test]
         public void LDA_ZeroPage()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor(0x1000)
-                .AddChip(0x0000, new TestMemoryChip(25, expectedRegisterValue))
-                .AddChip(0x1000, new TestMemoryChip((int)OpCode.LDAzp, 1));
+            HavingProcessor(0x1000)
+                .WithMemoryChip(0x0000, AnyByte, 0x2A)
+                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPage, 1);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterA);
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void LDA_ZeroPageX()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(x: 0x01)
+                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
+                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPageX, 0x01);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x6C);
         }
 
         [Test]
         public void LDA_Absolute()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor(0x1000)
-                .AddChip(0x1000, new TestMemoryChip((int)OpCode.LDAa, 0x01, 0x20))
-                .AddChip(0x2000, new TestMemoryChip(25, expectedRegisterValue));
+            HavingProcessor(0x1000)
+                .WithMemoryChip(0x1000, (int)OpCode.LDA_Absolute, 0x01, 0x20)
+                .WithMemoryChip(0x2000, AnyByte, 0x2A);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterA);
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void LDA_AbsoluteX()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(x: 0x01)
+                .WithMemoryChip(0x1000, (int)OpCode.LDA_AbsoluteX, 0x01, 0x20)
+                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void LDA_AbsoluteY()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(y: 0x01)
+                .WithMemoryChip(0x1000, (int)OpCode.LDA_AbsoluteY, 0x01, 0x20)
+                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void LDA_IndirectX()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(x: 0x01)
+                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x01, 0x20)
+                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPageIndirectX, 0x01)
+                .WithMemoryChip(0x2000, AnyByte, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void LDA_IndirectY()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(y: 0x01)
+                .WithMemoryChip(0x0000, AnyByte, 0x01, 0x20)
+                .WithMemoryChip(0x1000, (int)OpCode.LDA_ZeroPageYIndirect, 0x01)
+                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+
+            TickOnce();
+
+            RegisterA().Should().Be(0x2A);
         }
 
         [Test]
         public void LDX_Immediate()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor()
-                .AddChip(0x0000, new TestMemoryChip((int)OpCode.LDXi, expectedRegisterValue));
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.LDX_Immediate, 0x2A);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterX);
+            RegisterX().Should().Be(0x2A);
         }
 
         [Test]
         public void LDX_ZeroPage()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor(0x1000)
-                .AddChip(0x0000, new TestMemoryChip(25, expectedRegisterValue))
-                .AddChip(0x1000, new TestMemoryChip((int)OpCode.LDXzp, 1));
+            HavingProcessor(0x1000)
+                .WithMemoryChip(0x0000, AnyByte, 0x2A)
+                .WithMemoryChip(0x1000, (int)OpCode.LDX_ZeroPage, 1);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterX);
+            RegisterX().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void LDX_ZeroPageY()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(y: 0x01)
+                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
+                .WithMemoryChip(0x1000, (int)OpCode.LDX_ZeroPageY, 0x01);
+
+            TickOnce();
+
+            RegisterX().Should().Be(0x6C);
+        }
+
+        [Test]
+        public void LDX_AbsoluteY()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(y: 0x01)
+                .WithMemoryChip(0x1000, (int)OpCode.LDX_AbsoluteY, 0x01, 0x20)
+                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+
+            TickOnce();
+
+            RegisterX().Should().Be(0x2A);
         }
 
         [Test]
         public void LDX_Absolute()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor(0x1000)
-                .AddChip(0x1000, new TestMemoryChip((int)OpCode.LDXa, 0x01, 0x20))
-                .AddChip(0x2000, new TestMemoryChip(25, expectedRegisterValue));
+            HavingProcessor(0x1000)
+                .WithMemoryChip(0x1000, (int)OpCode.LDX_Absolute, 0x01, 0x20)
+                .WithMemoryChip(0x2000, AnyByte, 0x2A);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterX);
+            RegisterX().Should().Be(0x2A);
         }
 
         [Test]
         public void LDY_Immediate()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor()
-                .AddChip(0x0000, new TestMemoryChip((int)OpCode.LDYi, expectedRegisterValue));
+            HavingProcessor()
+                .WithMemoryChip(0x0000, (int)OpCode.LDY_Immediate, 0x2A);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterY);
+            RegisterY().Should().Be(0x2A);
         }
 
         [Test]
         public void LDY_ZeroPage()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor(0x1000)
-                .AddChip(0x0000, new TestMemoryChip(25, expectedRegisterValue))
-                .AddChip(0x1000, new TestMemoryChip((int)OpCode.LDYzp, 1));
+            HavingProcessor(0x1000)
+                .WithMemoryChip(0x0000, AnyByte, 0x2A)
+                .WithMemoryChip(0x1000, (int)OpCode.LDY_ZeroPage, 1);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterY);
+            RegisterY().Should().Be(0x2A);
+        }
+
+        [Test]
+        public void LDY_ZeroPageX()
+        {
+            HavingProcessor(0x1000)
+                .WithInternalState(x: 0x01)
+                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
+                .WithMemoryChip(0x1000, (int)OpCode.LDY_ZeroPageX, 0x01);
+
+            TickOnce();
+
+            RegisterY().Should().Be(0x6C);
         }
 
         [Test]
         public void LDY_Absolute()
         {
-            // arrange
-            var expectedRegisterValue = 42;
-            var processor = CreateProcessor(0x1000)
-                .AddChip(0x1000, new TestMemoryChip((int)OpCode.LDYa, 0x01, 0x20))
-                .AddChip(0x2000, new TestMemoryChip(25, expectedRegisterValue));
+            HavingProcessor(0x1000)
+                .WithMemoryChip(0x1000, (int)OpCode.LDY_Absolute, 0x01, 0x20)
+                .WithMemoryChip(0x2000, AnyByte, 0x2A);
 
-            // act
-            _testClock.TickOnce();
+            TickOnce();
 
-            // assert
-            Assert.AreEqual(expectedRegisterValue, processor.GetInternalInfo().RegisterY);
+            RegisterY().Should().Be(0x2A);
         }
 
-        private Processor6502 CreateProcessor()
+        [Test]
+        public void LDY_AbsoluteX()
         {
-            return new Processor6502(_testClock, new ProgramCounter());
-        }
+            HavingProcessor(0x1000)
+                .WithInternalState(x: 0x01)
+                .WithMemoryChip(0x1000, (int)OpCode.LDY_AbsoluteX, 0x01, 0x20)
+                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
 
-        private Processor6502 CreateProcessor(ushort initialProgramCounterValue)
-        {
-            return new Processor6502(_testClock, new ProgramCounter(initialProgramCounterValue));
+            TickOnce();
+
+            RegisterY().Should().Be(0x2A);
         }
     }
 }

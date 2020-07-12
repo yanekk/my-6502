@@ -31,34 +31,61 @@ namespace _6502.Emulator.Processor
             var opcode = (OpCode)GetNextByte();
             switch(opcode)
             {
-                case OpCode.LDAi:
+                case OpCode.LDA_Immediate:
                     _registerA = GetNextByte();
                     break;
-                case OpCode.LDAzp:
+                case OpCode.LDA_ZeroPage:
                     _registerA = GetByte(GetNextByte());
                     break;
-                case OpCode.LDAa:
-                    _registerA = GetByte((ushort)(GetNextByte() | GetNextByte() << 8));
+                case OpCode.LDA_ZeroPageX:
+                    _registerA = GetByte(GetNextByte(), _registerX);
+                    break;
+                case OpCode.LDA_Absolute:
+                    _registerA = GetByte(GetUShort());
+                    break;
+                case OpCode.LDA_AbsoluteX:
+                    _registerA = GetByte(GetUShort(), _registerX);
+                    break;
+                case OpCode.LDA_AbsoluteY:
+                    _registerA = GetByte(GetUShort(), _registerY);
+                    break;
+                case OpCode.LDA_ZeroPageIndirectX:
+                    _registerA = GetByte(GetUShort(GetNextByte(_registerX)));
+                    break;
+                case OpCode.LDA_ZeroPageYIndirect:
+                    _registerA = GetByte(GetUShort(GetNextByte()), _registerY);
                     break;
 
-                case OpCode.LDXi:
+                case OpCode.LDX_Immediate:
                     _registerX = GetNextByte();
                     break;
-                case OpCode.LDXzp:
+                case OpCode.LDX_ZeroPage:
                     _registerX = GetByte(GetNextByte());
                     break;
-                case OpCode.LDXa:
-                    _registerX = GetByte((ushort)(GetNextByte() | GetNextByte() << 8));
+                case OpCode.LDX_ZeroPageY:
+                    _registerX = GetByte(GetNextByte(), _registerY);
+                    break;
+                case OpCode.LDX_Absolute:
+                    _registerX = GetByte(GetUShort());
+                    break;
+                case OpCode.LDX_AbsoluteY:
+                    _registerX = GetByte(GetUShort(), _registerY);
                     break;
 
-                case OpCode.LDYi:
+                case OpCode.LDY_Immediate:
                     _registerY = GetNextByte();
                     break;
-                case OpCode.LDYzp:
+                case OpCode.LDY_ZeroPage:
                     _registerY = GetByte(GetNextByte());
                     break;
-                case OpCode.LDYa:
-                    _registerY = GetByte((ushort)(GetNextByte() | GetNextByte() << 8));
+                case OpCode.LDY_ZeroPageX:
+                    _registerY = GetByte(GetNextByte(), _registerX);
+                    break;
+                case OpCode.LDY_Absolute:
+                    _registerY = GetByte(GetUShort());
+                    break;
+                case OpCode.LDY_AbsoluteX:
+                    _registerY = GetByte(GetUShort(), _registerX);
                     break;
 
                 default:
@@ -66,9 +93,34 @@ namespace _6502.Emulator.Processor
             }
         }
 
+        private byte GetByte(ushort address, byte offset)
+        {
+            return GetByte((ushort)(address + offset));
+        }
+
+        private ushort GetUShort()
+        {
+            return (ushort)(GetNextByte() | GetNextByte() << 8);
+        }
+
+        private ushort GetUShort(ushort address)
+        {
+            return (ushort)(GetByte(address) | (GetByte(address, 1)) << 8);
+        }
+
+        private ushort GetUShort(ushort address, byte offset)
+        {
+            return (ushort)(GetUShort(address) + offset);
+        }
+
         private byte GetNextByte()
         {
             return GetByte(_programCounter.Next());
+        }
+
+        private byte GetNextByte(byte offset)
+        {
+            return (byte)(GetNextByte() + offset);
         }
 
         private byte GetByte(ushort address)
@@ -89,9 +141,9 @@ namespace _6502.Emulator.Processor
 
         }
 
-        internal ProcessorInternalInfo GetInternalInfo()
+        internal ProcessorInternalState GetInternalState()
         {
-            return new ProcessorInternalInfo
+            return new ProcessorInternalState
             {
                 RegisterA = _registerA,
                 RegisterX = _registerX,
@@ -99,7 +151,7 @@ namespace _6502.Emulator.Processor
             };
         }
 
-        internal void SetInternalInfo(ProcessorInternalInfo internalInfo)
+        internal void SetInternalInfo(ProcessorInternalState internalInfo)
         {
             _registerA = internalInfo.RegisterA;
             _registerX = internalInfo.RegisterX;
