@@ -37,6 +37,31 @@ namespace _6502.Emulator.Processor
             var opcode = (OpCode)GetNextByte();
             switch(opcode)
             {
+                case OpCode.AND_Immediate:
+                    _registerA &= GetNextByte();
+                    break;
+                case OpCode.AND_ZeroPage:
+                    _registerA &= GetByte(GetNextByte());
+                    break;
+                case OpCode.AND_ZeroPageX:
+                    _registerA &= GetByte(GetNextByte(), _registerX);
+                    break;
+                case OpCode.AND_Absolute:
+                    _registerA &= GetByte(GetUShort());
+                    break;
+                case OpCode.AND_AbsoluteX:
+                    _registerA &= GetByte(GetUShort(), _registerX);
+                    break;
+                case OpCode.AND_AbsoluteY:
+                    _registerA &= GetByte(GetUShort(), _registerY);
+                    break;
+                case OpCode.AND_ZeroPageIndirectX:
+                    _registerA &= GetByte(GetUShort(GetNextByte(_registerX)));
+                    break;
+                case OpCode.AND_ZeroPageYIndirect:
+                    _registerA &= GetByte(GetUShort(GetNextByte()), _registerY);
+                    break;
+
                 case OpCode.CLC:
                     _carryFlag = false;
                     break;
@@ -48,6 +73,31 @@ namespace _6502.Emulator.Processor
                     break;
                 case OpCode.CLV:
                     _overflowFlag = false;
+                    break;
+
+                case OpCode.EOR_Immediate:
+                    _registerA ^= GetNextByte();
+                    break;
+                case OpCode.EOR_ZeroPage:
+                    _registerA ^= GetByte(GetNextByte());
+                    break;
+                case OpCode.EOR_ZeroPageX:
+                    _registerA ^= GetByte(GetNextByte(), _registerX);
+                    break;
+                case OpCode.EOR_Absolute:
+                    _registerA ^= GetByte(GetUShort());
+                    break;
+                case OpCode.EOR_AbsoluteX:
+                    _registerA ^= GetByte(GetUShort(), _registerX);
+                    break;
+                case OpCode.EOR_AbsoluteY:
+                    _registerA ^= GetByte(GetUShort(), _registerY);
+                    break;
+                case OpCode.EOR_ZeroPageIndirectX:
+                    _registerA ^= GetByte(GetUShort(GetNextByte(_registerX)));
+                    break;
+                case OpCode.EOR_ZeroPageYIndirect:
+                    _registerA ^= GetByte(GetUShort(GetNextByte()), _registerY);
                     break;
 
                 case OpCode.LDA_Immediate:
@@ -107,6 +157,31 @@ namespace _6502.Emulator.Processor
                     _registerY = GetByte(GetUShort(), _registerX);
                     break;
 
+                case OpCode.ORA_Immediate:
+                    _registerA |= GetNextByte();
+                    break;
+                case OpCode.ORA_ZeroPage:
+                    _registerA |= GetByte(GetNextByte());
+                    break;
+                case OpCode.ORA_ZeroPageX:
+                    _registerA |= GetByte(GetNextByte(), _registerX);
+                    break;
+                case OpCode.ORA_Absolute:
+                    _registerA |= GetByte(GetUShort());
+                    break;
+                case OpCode.ORA_AbsoluteX:
+                    _registerA |= GetByte(GetUShort(), _registerX);
+                    break;
+                case OpCode.ORA_AbsoluteY:
+                    _registerA |= GetByte(GetUShort(), _registerY);
+                    break;
+                case OpCode.ORA_ZeroPageIndirectX:
+                    _registerA |= GetByte(GetUShort(GetNextByte(_registerX)));
+                    break;
+                case OpCode.ORA_ZeroPageYIndirect:
+                    _registerA |= GetByte(GetUShort(GetNextByte()), _registerY);
+                    break;
+
                 case OpCode.TAX:
                     _registerX = _registerA;
                     break;
@@ -147,15 +222,6 @@ namespace _6502.Emulator.Processor
                 case OpCode.ADC_AbsoluteY:
                 case OpCode.ADC_ZeroPageIndirectX:
                 case OpCode.ADC_ZeroPageYIndirect:
-
-                case OpCode.AND_Immediate:
-                case OpCode.AND_ZeroPage:
-                case OpCode.AND_ZeroPageX:
-                case OpCode.AND_Absolute:
-                case OpCode.AND_AbsoluteX:
-                case OpCode.AND_AbsoluteY:
-                case OpCode.AND_ZeroPageIndirectX:
-                case OpCode.AND_ZeroPageYIndirect:
 
                 case OpCode.ASL:
                 case OpCode.ASL_ZeroPage:
@@ -200,15 +266,6 @@ namespace _6502.Emulator.Processor
                 case OpCode.DEX:
                 case OpCode.DEY:
 
-                case OpCode.EOR_Immediate:
-                case OpCode.EOR_ZeroPage:
-                case OpCode.EOR_ZeroPageX:
-                case OpCode.EOR_Absolute:
-                case OpCode.EOR_AbsoluteX:
-                case OpCode.EOR_AbsoluteY:
-                case OpCode.EOR_ZeroPageIndirectX:
-                case OpCode.EOR_ZeroPageYIndirect:
-
                 case OpCode.INC_ZeroPage:
                 case OpCode.INC_ZeroPageX:
                 case OpCode.INC_Absolute:
@@ -227,15 +284,6 @@ namespace _6502.Emulator.Processor
                 case OpCode.LSR_AbsoluteX:
 
                 case OpCode.NOP:
-
-                case OpCode.ORA_Immediate:
-                case OpCode.ORA_ZeroPage:
-                case OpCode.ORA_ZeroPageX:
-                case OpCode.ORA_Absolute:
-                case OpCode.ORA_AbsoluteX:
-                case OpCode.ORA_AbsoluteY:
-                case OpCode.ORA_ZeroPageIndirectX:
-                case OpCode.ORA_ZeroPageYIndirect:
 
                 case OpCode.PHA:
                 case OpCode.PLA:

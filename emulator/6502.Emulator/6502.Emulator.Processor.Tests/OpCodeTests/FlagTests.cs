@@ -12,7 +12,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor()
                 .WithInternalState(overflowFlag: true)
-                .WithMemoryChip((int)OpCode.CLV);
+                .WithMemoryChip(0x0000, (int)OpCode.CLV);
 
             TickOnce();
 
@@ -24,7 +24,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor()
                 .WithInternalState(interruptDisableFlag: false)
-                .WithMemoryChip((int)OpCode.SEI);
+                .WithMemoryChip(0x0000, (int)OpCode.SEI);
 
             TickOnce();
 
@@ -36,7 +36,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor()
                 .WithInternalState(interruptDisableFlag: true)
-                .WithMemoryChip((int)OpCode.CLI);
+                .WithMemoryChip(0x0000, (int)OpCode.CLI);
 
             TickOnce();
 
@@ -48,7 +48,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor()
                 .WithInternalState(decimalFlag: false)
-                .WithMemoryChip((int)OpCode.SED);
+                .WithMemoryChip(0x0000, (int)OpCode.SED);
 
             TickOnce();
 
@@ -60,7 +60,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor()
                 .WithInternalState(decimalFlag: true)
-                .WithMemoryChip((int)OpCode.CLD);
+                .WithMemoryChip(0x0000, (int)OpCode.CLD);
 
             TickOnce();
 
@@ -72,7 +72,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor()
                 .WithInternalState(carryFlag: false)
-                .WithMemoryChip((int)OpCode.SEC);
+                .WithMemoryChip(0x0000, (int)OpCode.SEC);
 
             TickOnce();
 
@@ -84,7 +84,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor()
                 .WithInternalState(carryFlag: true)
-                .WithMemoryChip((int)OpCode.CLC);
+                .WithMemoryChip(0x0000, (int)OpCode.CLC);
 
             TickOnce();
             CarryFlag().Should().BeFalse();

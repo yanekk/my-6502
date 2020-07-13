@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace _6502.Emulator.Processor.Tests.OpCodeTests
 {
     [TestFixture]
-    internal class AndTests : BaseTests
+    internal class CompareTests : BaseTests
     {
         [Test]
         public void CMP_Immediate()

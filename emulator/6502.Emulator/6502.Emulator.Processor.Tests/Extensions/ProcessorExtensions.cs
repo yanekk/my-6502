@@ -4,12 +4,6 @@ namespace _6502.Emulator.Processor.Tests.Extensions
 {
     public static class ProcessorExtensions
     {
-        public static Processor6502 WithMemoryChip(this Processor6502 processor, params int[] data)
-        {
-            return processor
-                .AddChip(0x0000, new TestMemoryChip(data));
-        }
-
         public static Processor6502 WithMemoryChip(this Processor6502 processor, ushort address, params int[] data)
         {
             return processor
