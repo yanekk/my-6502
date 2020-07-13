@@ -10,5 +10,6 @@
         public bool CarryFlag { get; set; }
         public bool InterruptDisableFlag { get; set; }
         public bool OverflowFlag { get; set; }
+        public MemoryInternalState Memory { get; set; }
     }
 }

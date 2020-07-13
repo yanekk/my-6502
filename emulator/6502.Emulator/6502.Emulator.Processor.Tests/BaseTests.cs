@@ -61,6 +61,11 @@ namespace _6502.Emulator.Processor.Tests
             return _processor.GetInternalState().StackPointer;
         }
 
+        protected byte MemoryAt(ushort address)
+        {
+            return _processor.GetInternalState().Memory.GetByte(address);
+        }
+
         protected bool CarryFlag()
         {
             return _processor.GetInternalState().CarryFlag;

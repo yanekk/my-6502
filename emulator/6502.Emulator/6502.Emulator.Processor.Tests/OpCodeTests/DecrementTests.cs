@@ -11,12 +11,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void DEC_ZeroPage()
         {
             HavingProcessor(0x1000)
-                .WithMemoryChip(0x0000, AnyByte, 0x2A)
+                .WithMemoryChip(0x0000, AnyByte, 0x03)
                 .WithMemoryChip(0x1000, (int)OpCode.DEC_ZeroPage, 1);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            MemoryAt(0x0001).Should().Be(0x02);
         }
 
         [Test]
@@ -24,12 +24,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
-                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
+                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x03)
                 .WithMemoryChip(0x1000, (int)OpCode.DEC_ZeroPageX, 0x01);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x6C);
+            MemoryAt(0x0002).Should().Be(0x02);
         }
 
         [Test]
@@ -37,11 +37,11 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor(0x1000)
                 .WithMemoryChip(0x1000, (int)OpCode.DEC_Absolute, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, 0x2A);
+                .WithMemoryChip(0x2000, AnyByte, 0x03);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            MemoryAt(0x2001).Should().Be(0x02);
         }
 
         [Test]
@@ -50,37 +50,35 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
                 .WithMemoryChip(0x1000, (int)OpCode.DEC_AbsoluteX, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x03);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            MemoryAt(0x2002).Should().Be(0x02);
         }
 
         [Test]
         public void DEX()
         {
             HavingProcessor(0x1000)
-                .WithInternalState(x: 0x01)
-                .WithMemoryChip(0x1000, (int)OpCode.DEX, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+                .WithInternalState(x: 0x03)
+                .WithMemoryChip(0x1000, (int)OpCode.DEX);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            RegisterX().Should().Be(0x02);
         }
 
         [Test]
         public void DEY()
         {
             HavingProcessor(0x1000)
-                .WithInternalState(x: 0x01)
-                .WithMemoryChip(0x1000, (int)OpCode.DEY, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+                .WithInternalState(y: 0x03)
+                .WithMemoryChip(0x1000, (int)OpCode.DEY); ;
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            RegisterY().Should().Be(0x02);
         }
     }
 }

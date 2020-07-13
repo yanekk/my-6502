@@ -1,6 +1,7 @@
 ﻿using _6502.Emulator.Abstract;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace _6502.Emulator.Processor
 {
@@ -75,6 +76,25 @@ namespace _6502.Emulator.Processor
                     _overflowFlag = false;
                     break;
 
+                case OpCode.DEC_ZeroPage:
+                    SetByte(GetNextByte(), v => --v);
+                    break;
+                case OpCode.DEC_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, v => --v);
+                    break;
+                case OpCode.DEC_Absolute:
+                    SetByte(GetUShort(), v => --v);
+                    break;
+                case OpCode.DEC_AbsoluteX:
+                    SetByte(GetUShort(), _registerX, v => --v);
+                    break;
+                case OpCode.DEX:
+                    _registerX--;
+                    break;
+                case OpCode.DEY:
+                    _registerY--;
+                    break;
+
                 case OpCode.EOR_Immediate:
                     _registerA ^= GetNextByte();
                     break;
@@ -98,6 +118,25 @@ namespace _6502.Emulator.Processor
                     break;
                 case OpCode.EOR_ZeroPageYIndirect:
                     _registerA ^= GetByte(GetUShort(GetNextByte()), _registerY);
+                    break;
+
+                case OpCode.INC_ZeroPage:
+                    SetByte(GetNextByte(), v => ++v);
+                    break;
+                case OpCode.INC_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, v => ++v);
+                    break;
+                case OpCode.INC_Absolute:
+                    SetByte(GetUShort(), v => ++v);
+                    break;
+                case OpCode.INC_AbsoluteX:
+                    SetByte(GetUShort(), _registerX, v => ++v);
+                    break;
+                case OpCode.INX:
+                    _registerX++;
+                    break;
+                case OpCode.INY:
+                    _registerY++;
                     break;
 
                 case OpCode.LDA_Immediate:
@@ -258,22 +297,6 @@ namespace _6502.Emulator.Processor
                 case OpCode.CPY_ZeroPage:
                 case OpCode.CPY_Absolute:
 
-                case OpCode.DEC_ZeroPage:
-                case OpCode.DEC_ZeroPageX:
-                case OpCode.DEC_Absolute:
-                case OpCode.DEC_AbsoluteX:
-
-                case OpCode.DEX:
-                case OpCode.DEY:
-
-                case OpCode.INC_ZeroPage:
-                case OpCode.INC_ZeroPageX:
-                case OpCode.INC_Absolute:
-                case OpCode.INC_AbsoluteX:
-
-                case OpCode.INX:
-                case OpCode.INY:
-
                 case OpCode.JMP_Absolute:
                 case OpCode.JMP_Indirect:
 
@@ -362,24 +385,56 @@ namespace _6502.Emulator.Processor
 
         private byte GetByte(ushort address)
         {
-            foreach(var range in _chips.Keys)
+            var (start, chip) = FindChip(address);
+            if (chip != null)
+                return chip.Get((ushort)(address - start));
+            return 0;
+        }
+
+        private void SetByte(ushort address, byte offset, Func<byte, byte> valueClosure)
+        {
+            SetByte((ushort)(address + offset), valueClosure);
+        }
+
+        private void SetByte(ushort address, Func<byte, byte> valueClosure)
+        {
+            var (start, chip) = FindChip(address);
+            if (chip == null)
+                return;
+            var realAddress = (ushort)(address - start);
+            var value = chip.Get(realAddress);
+            chip.Set(realAddress, valueClosure(value));
+        }
+
+        private (ushort, IMemoryChip) FindChip(ushort address)
+        {
+            foreach (var range in _chips.Keys)
             {
                 ushort start = ((ushort)range.Start.Value);
                 ushort end = ((ushort)range.End.Value);
 
                 if (start <= address && address < end)
-                    return _chips[range].Get((ushort)(address - start));
+                    return (start, _chips[range]);
             }
-            return 0;
-        }
-
-        private void SetByte(ushort address, byte value)
-        {
-
+            return (0, null);
         }
 
         internal ProcessorInternalState GetInternalState()
         {
+            var memory = _chips.Keys
+                .SelectMany(range =>
+                {
+                    var chip = _chips[range];
+                    var result = new List<KeyValuePair<ushort, byte>>();
+
+                    for (var address = range.Start.Value; address < range.End.Value; address++)
+                    {
+                        result.Add(new KeyValuePair<ushort, byte>((ushort)address, chip.Get((ushort)(address - range.Start.Value))));
+                    }
+                    return result;
+                })
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+
             return new ProcessorInternalState
             {
                 RegisterA = _registerA,
@@ -389,7 +444,8 @@ namespace _6502.Emulator.Processor
                 CarryFlag = _carryFlag,
                 DecimalFlag = _decimalFlag,
                 InterruptDisableFlag = _interruptDisableFlag,
-                OverflowFlag = _overflowFlag
+                OverflowFlag = _overflowFlag,
+                Memory = new MemoryInternalState(memory)
             };
         }
 
