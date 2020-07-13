@@ -250,6 +250,48 @@ namespace _6502.Emulator.Processor
                     _interruptDisableFlag = true;
                     break;
 
+                case OpCode.STA_ZeroPage:
+                    SetByte(GetNextByte(), v => _registerA);
+                    break;
+                case OpCode.STA_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, v => _registerA);
+                    break;
+                case OpCode.STA_Absolute:
+                    SetByte(GetUShort(), v => _registerA);
+                    break;
+                case OpCode.STA_AbsoluteX:
+                    SetByte(GetUShort(), _registerX, v => _registerA);
+                    break;
+                case OpCode.STA_AbsoluteY:
+                    SetByte(GetUShort(), _registerY, v => _registerA);
+                    break;
+                case OpCode.STA_ZeroPageIndirectX:
+                    SetByte(GetUShort(GetNextByte(_registerX)), v => _registerA);
+                    break;
+                case OpCode.STA_ZeroPageYIndirect:
+                    SetByte(GetUShort(GetNextByte()), _registerY, v => _registerA);
+                    break;
+
+                case OpCode.STX_ZeroPage:
+                    SetByte(GetNextByte(), v => _registerX);
+                    break;
+                case OpCode.STX_ZeroPageY:
+                    SetByte(GetNextByte(), _registerY, v => _registerX);
+                    break;
+                case OpCode.STX_Absolute:
+                    SetByte(GetUShort(), v => _registerX);
+                    break;
+
+                case OpCode.STY_ZeroPage:
+                    SetByte(GetNextByte(), v => _registerY);
+                    break;
+                case OpCode.STY_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, v => _registerY);
+                    break;
+                case OpCode.STY_Absolute:
+                    SetByte(GetUShort(), v => _registerY);
+                    break;
+
                 case OpCode.BRK:
                 case OpCode.JSR:
 
@@ -338,21 +380,6 @@ namespace _6502.Emulator.Processor
                 case OpCode.SBC_ZeroPageIndirectX:
                 case OpCode.SBC_ZeroPageYIndirect:
 
-                case OpCode.STA_ZeroPage:
-                case OpCode.STA_ZeroPageX:
-                case OpCode.STA_Absolute:
-                case OpCode.STA_AbsoluteX:
-                case OpCode.STA_AbsoluteY:
-                case OpCode.STA_ZeroPageIndirectX:
-                case OpCode.STA_ZeroPageYIndirect:
-
-                case OpCode.STX_ZeroPage:
-                case OpCode.STX_ZeroPageY:
-                case OpCode.STX_Absolute:
-
-                case OpCode.STY_ZeroPage:
-                case OpCode.STY_ZeroPageX:
-                case OpCode.STY_Absolute:
                 default:
                     throw new Exception($"Unknown opcode: {opcode}");
             }
