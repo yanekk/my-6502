@@ -10,25 +10,25 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         [Test]
         public void LSR()
         {
-            HavingProcessor(0x1000)
-                .WithMemoryChip(0x0000, AnyByte, 0x2A)
-                .WithMemoryChip(0x1000, (int)OpCode.LSR, 1);
+            HavingProcessor()
+                .WithInternalState(a: 0x04)
+                .WithMemoryChip(0x0000, (int)OpCode.LSR);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            RegisterA().Should().Be(0x02);
         }
 
         [Test]
         public void LSR_ZeroPage()
         {
             HavingProcessor(0x1000)
-                .WithMemoryChip(0x0000, AnyByte, 0x2A)
+                .WithMemoryChip(0x0000, AnyByte, 0x04)
                 .WithMemoryChip(0x1000, (int)OpCode.LSR_ZeroPage, 1);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            MemoryAt(0x0001).Should().Be(0x02);
         }
 
         [Test]
@@ -36,12 +36,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
-                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x6C)
+                .WithMemoryChip(0x0000, AnyByte, AnyByte, 0x04)
                 .WithMemoryChip(0x1000, (int)OpCode.LSR_ZeroPageX, 0x01);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x6C);
+            MemoryAt(0x0002).Should().Be(0x02);
         }
 
         [Test]
@@ -49,11 +49,11 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         {
             HavingProcessor(0x1000)
                 .WithMemoryChip(0x1000, (int)OpCode.LSR_Absolute, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, 0x2A);
+                .WithMemoryChip(0x2000, AnyByte, 0x04);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            MemoryAt(0x2001).Should().Be(0x02);
         }
 
         [Test]
@@ -62,11 +62,11 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
             HavingProcessor(0x1000)
                 .WithInternalState(x: 0x01)
                 .WithMemoryChip(0x1000, (int)OpCode.LSR_AbsoluteX, 0x01, 0x20)
-                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x2A);
+                .WithMemoryChip(0x2000, AnyByte, AnyByte, 0x04);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            MemoryAt(0x2002).Should().Be(0x02);
         }
     }
 }

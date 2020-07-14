@@ -22,7 +22,8 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void PLA()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.PLA, 0x2A);
+                .WithInternalState(stack: new byte[] { 0x2A })
+                .WithMemoryChip(0x0000, (int)OpCode.PLA);
 
             TickOnce();
 
@@ -33,6 +34,7 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void PHP()
         {
             HavingProcessor()
+                .WithInternalState(stack: new byte[] { 0x2A })
                 .WithMemoryChip(0x0000, (int)OpCode.PHP, 0x2A);
 
             TickOnce();
@@ -44,11 +46,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void PHA()
         {
             HavingProcessor()
+                .WithInternalState(a: 0x2A)
                 .WithMemoryChip(0x0000, (int)OpCode.PHA, 0x2A);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            Stack().Should().StartWith(0x2A);
         }
     }
 }

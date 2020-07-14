@@ -85,5 +85,10 @@ namespace _6502.Emulator.Processor.Tests
         {
             return _processor.GetInternalState().OverflowFlag;
         }
+
+        protected byte[] Stack()
+        {
+            return _processor.GetInternalState().Stack;
+        }
     }
 }

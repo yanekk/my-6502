@@ -1,5 +1,4 @@
 ﻿using _6502.Emulator.Processor.Tests.Extensions;
-using FluentAssertions;
 using NUnit.Framework;
 
 namespace _6502.Emulator.Processor.Tests.OpCodeTests
@@ -10,11 +9,9 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void NOP()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.NOP, 0x2A);
+                .WithMemoryChip(0x0000, (int)OpCode.NOP);
 
-            TickOnce();
-
-            RegisterA().Should().Be(0x2A);
+            Assert.DoesNotThrow(() => { TickOnce(); });
         }
     }
 }

@@ -12,12 +12,10 @@ namespace _6502.Emulator.Processor
         private byte _registerA = 0;
         private byte _registerX = 0;
         private byte _registerY = 0;
-        private byte _stackPointer = 0;
+        private byte _stackPointer = 0xFF;
+        private ProcessorFlags _flagRegister = 0;
 
-        private bool _carryFlag = false;
-        private bool _decimalFlag = false;
-        private bool _interruptDisableFlag = false;
-        private bool _overflowFlag = false;
+        private Stack<byte> _stack = new Stack<byte>();
 
         private Dictionary<Range, IMemoryChip> _chips = new Dictionary<Range, IMemoryChip>();
 
@@ -63,17 +61,33 @@ namespace _6502.Emulator.Processor
                     _registerA &= GetByte(GetUShort(GetNextByte()), _registerY);
                     break;
 
+                case OpCode.ASL:
+                    _registerA = (byte)(_registerA << 1);
+                    break;
+                case OpCode.ASL_ZeroPage:
+                    SetByte(GetNextByte(), v => (byte)(v << 1));
+                    break;
+                case OpCode.ASL_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, v => (byte)(v << 1));
+                    break;
+                case OpCode.ASL_Absolute:
+                    SetByte(GetUShort(), v => (byte)(v << 1));
+                    break;
+                case OpCode.ASL_AbsoluteX:
+                    SetByte(GetUShort(), _registerX, v => (byte)(v << 1));
+                    break;
+
                 case OpCode.CLC:
-                    _carryFlag = false;
+                    _flagRegister &= ~ProcessorFlags.Carry;
                     break;
                 case OpCode.CLD:
-                    _decimalFlag = false;
+                    _flagRegister &= ~ProcessorFlags.Decimal;
                     break;
                 case OpCode.CLI:
-                    _interruptDisableFlag = false;
+                    _flagRegister &= ~ProcessorFlags.InterruptDisable;
                     break;
                 case OpCode.CLV:
-                    _overflowFlag = false;
+                    _flagRegister &= ~ProcessorFlags.Overflow;
                     break;
 
                 case OpCode.DEC_ZeroPage:
@@ -196,6 +210,25 @@ namespace _6502.Emulator.Processor
                     _registerY = GetByte(GetUShort(), _registerX);
                     break;
 
+                case OpCode.LSR:
+                    _registerA = (byte)(_registerA >> 1);
+                    break;
+                case OpCode.LSR_ZeroPage:
+                    SetByte(GetNextByte(), v => (byte)(v >> 1));
+                    break;
+                case OpCode.LSR_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, v => (byte)(v >> 1));
+                    break;
+                case OpCode.LSR_Absolute:
+                    SetByte(GetUShort(), v => (byte)(v >> 1));
+                    break;
+                case OpCode.LSR_AbsoluteX:
+                    SetByte(GetUShort(), _registerX, v => (byte)(v >> 1));
+                    break;
+
+                case OpCode.NOP:
+                    break;
+
                 case OpCode.ORA_Immediate:
                     _registerA |= GetNextByte();
                     break;
@@ -221,6 +254,48 @@ namespace _6502.Emulator.Processor
                     _registerA |= GetByte(GetUShort(GetNextByte()), _registerY);
                     break;
 
+                case OpCode.PHA:
+                    _stack.Push(_registerA);
+                    _stackPointer--;
+                    break;
+
+                case OpCode.PLA:
+                    _registerA = _stack.Pop();
+                    _stackPointer++;
+                    break;
+
+                case OpCode.ROL:
+                    _registerA = RotateLeft(_registerA);
+                    break;
+                case OpCode.ROL_ZeroPage:
+                    SetByte(GetNextByte(), RotateLeft);
+                    break;
+                case OpCode.ROL_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, RotateLeft);
+                    break;
+                case OpCode.ROL_Absolute:
+                    SetByte(GetUShort(), RotateLeft);
+                    break;
+                case OpCode.ROL_AbsoluteX:
+                    SetByte(GetUShort(), _registerX, RotateLeft);
+                    break;
+
+                case OpCode.ROR:
+                    _registerA = RotateRight(_registerA);
+                    break;
+                case OpCode.ROR_ZeroPage:
+                    SetByte(GetNextByte(), RotateRight);
+                    break;
+                case OpCode.ROR_ZeroPageX:
+                    SetByte(GetNextByte(), _registerX, RotateRight);
+                    break;
+                case OpCode.ROR_Absolute:
+                    SetByte(GetUShort(), RotateRight);
+                    break;
+                case OpCode.ROR_AbsoluteX:
+                    SetByte(GetUShort(), _registerX, RotateRight);
+                    break;
+
                 case OpCode.TAX:
                     _registerX = _registerA;
                     break;
@@ -241,13 +316,13 @@ namespace _6502.Emulator.Processor
                     break;
 
                 case OpCode.SEC:
-                    _carryFlag = true;
+                    _flagRegister |= ProcessorFlags.Carry;
                     break;
                 case OpCode.SED:
-                    _decimalFlag = true;
+                    _flagRegister |= ProcessorFlags.Decimal;
                     break;
                 case OpCode.SEI:
-                    _interruptDisableFlag = true;
+                    _flagRegister |= ProcessorFlags.InterruptDisable;
                     break;
 
                 case OpCode.STA_ZeroPage:
@@ -304,12 +379,6 @@ namespace _6502.Emulator.Processor
                 case OpCode.ADC_ZeroPageIndirectX:
                 case OpCode.ADC_ZeroPageYIndirect:
 
-                case OpCode.ASL:
-                case OpCode.ASL_ZeroPage:
-                case OpCode.ASL_ZeroPageX:
-                case OpCode.ASL_Absolute:
-                case OpCode.ASL_AbsoluteX:
-
                 case OpCode.BCC:
                 case OpCode.BCS:
                 case OpCode.BEQ:
@@ -342,31 +411,8 @@ namespace _6502.Emulator.Processor
                 case OpCode.JMP_Absolute:
                 case OpCode.JMP_Indirect:
 
-                case OpCode.LSR:
-                case OpCode.LSR_ZeroPage:
-                case OpCode.LSR_ZeroPageX:
-                case OpCode.LSR_Absolute:
-                case OpCode.LSR_AbsoluteX:
-
-                case OpCode.NOP:
-
-                case OpCode.PHA:
-                case OpCode.PLA:
-
                 case OpCode.PHP:
                 case OpCode.PLP:
-
-                case OpCode.ROL:
-                case OpCode.ROL_ZeroPage:
-                case OpCode.ROL_ZeroPageX:
-                case OpCode.ROL_Absolute:
-                case OpCode.ROL_AbsoluteX:
-
-                case OpCode.ROR:
-                case OpCode.ROR_ZeroPage:
-                case OpCode.ROR_ZeroPageX:
-                case OpCode.ROR_Absolute:
-                case OpCode.ROR_AbsoluteX:
 
                 case OpCode.RTI:
                 case OpCode.RTS:
@@ -446,6 +492,19 @@ namespace _6502.Emulator.Processor
             return (0, null);
         }
 
+        private byte RotateLeft(byte v)
+        {
+            return (byte)((byte)(v << 1) | ((byte)_flagRegister & (byte)ProcessorFlags.Carry));
+        }
+
+        private byte RotateRight(byte v)
+        {
+            v = (byte)(v >> 1);
+            if ((_flagRegister & ProcessorFlags.Carry) != 0)
+                v |= 0x80;
+            return v;
+        }
+
         internal ProcessorInternalState GetInternalState()
         {
             var memory = _chips.Keys
@@ -468,11 +527,12 @@ namespace _6502.Emulator.Processor
                 RegisterX = _registerX,
                 RegisterY = _registerY,
                 StackPointer = _stackPointer,
-                CarryFlag = _carryFlag,
-                DecimalFlag = _decimalFlag,
-                InterruptDisableFlag = _interruptDisableFlag,
-                OverflowFlag = _overflowFlag,
-                Memory = new MemoryInternalState(memory)
+                CarryFlag = (_flagRegister & ProcessorFlags.Carry) != 0,
+                DecimalFlag = (_flagRegister & ProcessorFlags.Decimal) != 0,
+                InterruptDisableFlag = (_flagRegister & ProcessorFlags.InterruptDisable) != 0,
+                OverflowFlag = (_flagRegister & ProcessorFlags.Overflow) != 0,
+                Memory = new MemoryInternalState(memory),
+                Stack = _stack.ToArray()
             };
         }
 
@@ -482,10 +542,15 @@ namespace _6502.Emulator.Processor
             _registerX = internalState.RegisterX;
             _registerY = internalState.RegisterY;
             _stackPointer = internalState.StackPointer;
-            _carryFlag = internalState.CarryFlag;
-            _decimalFlag = internalState.DecimalFlag;
-            _interruptDisableFlag = internalState.InterruptDisableFlag;
-            _overflowFlag = internalState.OverflowFlag;
+            if (internalState.CarryFlag)
+                _flagRegister |= ProcessorFlags.Carry;
+            if (internalState.DecimalFlag)
+                _flagRegister |= ProcessorFlags.Decimal;
+            if (internalState.InterruptDisableFlag)
+                _flagRegister |= ProcessorFlags.InterruptDisable;
+            if (internalState.OverflowFlag)
+                _flagRegister |= ProcessorFlags.Overflow;
+            _stack = new Stack<byte>(internalState.Stack);
         }
     }
 }
