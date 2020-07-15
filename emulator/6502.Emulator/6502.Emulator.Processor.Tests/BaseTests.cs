@@ -66,6 +66,11 @@ namespace _6502.Emulator.Processor.Tests
             return _processor.GetInternalState().Memory.GetByte(address);
         }
 
+        protected byte FlagRegister()
+        {
+            return _processor.GetInternalState().FlagRegister;
+        }
+
         protected bool CarryFlag()
         {
             return _processor.GetInternalState().CarryFlag;

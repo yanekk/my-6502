@@ -10,12 +10,14 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         [Test]
         public void PLP()
         {
+            byte flags = (byte)(ProcessorFlags.Carry | ProcessorFlags.Decimal | ProcessorFlags.InterruptDisable | ProcessorFlags.Overflow);
             HavingProcessor()
+                .WithInternalState(stack: new byte[] { flags })
                 .WithMemoryChip(0x0000, (int)OpCode.PLP, 0x2A);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            FlagRegister().Should().Be(flags);
         }
 
         [Test]
@@ -34,12 +36,12 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void PHP()
         {
             HavingProcessor()
-                .WithInternalState(stack: new byte[] { 0x2A })
+                .WithInternalState(carryFlag: true, decimalFlag: true, interruptDisableFlag: true, overflowFlag: true)
                 .WithMemoryChip(0x0000, (int)OpCode.PHP, 0x2A);
 
             TickOnce();
 
-            RegisterA().Should().Be(0x2A);
+            Stack().Should().StartWith((byte)(ProcessorFlags.Carry | ProcessorFlags.Decimal | ProcessorFlags.InterruptDisable | ProcessorFlags.Overflow));       
         }
 
         [Test]

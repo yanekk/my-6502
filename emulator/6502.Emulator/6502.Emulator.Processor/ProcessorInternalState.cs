@@ -12,5 +12,6 @@
         public bool OverflowFlag { get; set; }
         public MemoryInternalState Memory { get; set; }
         public byte[] Stack { get; set; }
+        public byte FlagRegister { get; set; }
     }
 }

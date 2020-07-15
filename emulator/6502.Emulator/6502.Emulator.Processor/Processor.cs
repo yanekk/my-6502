@@ -36,6 +36,31 @@ namespace _6502.Emulator.Processor
             var opcode = (OpCode)GetNextByte();
             switch(opcode)
             {
+                case OpCode.ADC_Immediate:
+                    _registerA += (byte)(GetNextByte() + Carry());
+                    break;
+                case OpCode.ADC_ZeroPage:
+                    _registerA += (byte)(GetByte(GetNextByte()) + Carry());
+                    break;
+                case OpCode.ADC_ZeroPageX:
+                    _registerA += (byte)(GetByte(GetNextByte(), _registerX) + Carry());
+                    break;
+                case OpCode.ADC_Absolute:
+                    _registerA += (byte)(GetByte(GetUShort()) + Carry());
+                    break;
+                case OpCode.ADC_AbsoluteX:
+                    _registerA += (byte)(GetByte(GetUShort(), _registerX) + Carry());
+                    break;
+                case OpCode.ADC_AbsoluteY:
+                    _registerA += (byte)(GetByte(GetUShort(), _registerY) + Carry());
+                    break;
+                case OpCode.ADC_ZeroPageIndirectX:
+                    _registerA += (byte)(GetByte(GetUShort(GetNextByte(_registerX))) + Carry());
+                    break;
+                case OpCode.ADC_ZeroPageYIndirect:
+                    _registerA += (byte)(GetByte(GetUShort(GetNextByte()), _registerY) + Carry());
+                    break;
+
                 case OpCode.AND_Immediate:
                     _registerA &= GetNextByte();
                     break;
@@ -264,6 +289,15 @@ namespace _6502.Emulator.Processor
                     _stackPointer++;
                     break;
 
+                case OpCode.PHP:
+                    _stack.Push((byte)_flagRegister);
+                    _stackPointer--;
+                    break;
+                case OpCode.PLP:
+                    _flagRegister = (ProcessorFlags)_stack.Pop();
+                    _stackPointer++;
+                    break;
+
                 case OpCode.ROL:
                     _registerA = RotateLeft(_registerA);
                     break;
@@ -296,23 +330,29 @@ namespace _6502.Emulator.Processor
                     SetByte(GetUShort(), _registerX, RotateRight);
                     break;
 
-                case OpCode.TAX:
-                    _registerX = _registerA;
+                case OpCode.SBC_Immediate:
+                    _registerA -= (byte)(GetNextByte() + Borrow());
                     break;
-                case OpCode.TAY:
-                    _registerY = _registerA;
+                case OpCode.SBC_ZeroPage:
+                    _registerA -= (byte)(GetByte(GetNextByte()) + Borrow());
                     break;
-                case OpCode.TSX:
-                    _registerX = _stackPointer;
+                case OpCode.SBC_ZeroPageX:
+                    _registerA -= (byte)(GetByte(GetNextByte(), _registerX) + Borrow());
                     break;
-                case OpCode.TXA:
-                    _registerA = _registerX;
+                case OpCode.SBC_Absolute:
+                    _registerA -= (byte)(GetByte(GetUShort()) + Borrow());
                     break;
-                case OpCode.TXS:
-                    _stackPointer = _registerX;
+                case OpCode.SBC_AbsoluteX:
+                    _registerA -= (byte)(GetByte(GetUShort(), _registerX) + Borrow());
                     break;
-                case OpCode.TYA:
-                    _registerA = _registerY;
+                case OpCode.SBC_AbsoluteY:
+                    _registerA -= (byte)(GetByte(GetUShort(), _registerY) + Borrow());
+                    break;
+                case OpCode.SBC_ZeroPageIndirectX:
+                    _registerA -= (byte)(GetByte(GetUShort(GetNextByte(_registerX))) + Borrow());
+                    break;
+                case OpCode.SBC_ZeroPageYIndirect:
+                    _registerA -= (byte)(GetByte(GetUShort(GetNextByte()), _registerY) + Borrow());
                     break;
 
                 case OpCode.SEC:
@@ -367,17 +407,27 @@ namespace _6502.Emulator.Processor
                     SetByte(GetUShort(), v => _registerY);
                     break;
 
+                case OpCode.TAX:
+                    _registerX = _registerA;
+                    break;
+                case OpCode.TAY:
+                    _registerY = _registerA;
+                    break;
+                case OpCode.TSX:
+                    _registerX = _stackPointer;
+                    break;
+                case OpCode.TXA:
+                    _registerA = _registerX;
+                    break;
+                case OpCode.TXS:
+                    _stackPointer = _registerX;
+                    break;
+                case OpCode.TYA:
+                    _registerA = _registerY;
+                    break;
+
                 case OpCode.BRK:
                 case OpCode.JSR:
-
-                case OpCode.ADC_Immediate:
-                case OpCode.ADC_ZeroPage:
-                case OpCode.ADC_ZeroPageX:
-                case OpCode.ADC_Absolute:
-                case OpCode.ADC_AbsoluteX:
-                case OpCode.ADC_AbsoluteY:
-                case OpCode.ADC_ZeroPageIndirectX:
-                case OpCode.ADC_ZeroPageYIndirect:
 
                 case OpCode.BCC:
                 case OpCode.BCS:
@@ -411,24 +461,22 @@ namespace _6502.Emulator.Processor
                 case OpCode.JMP_Absolute:
                 case OpCode.JMP_Indirect:
 
-                case OpCode.PHP:
-                case OpCode.PLP:
-
                 case OpCode.RTI:
                 case OpCode.RTS:
-
-                case OpCode.SBC_Immediate:
-                case OpCode.SBC_ZeroPage:
-                case OpCode.SBC_ZeroPageX:
-                case OpCode.SBC_Absolute:
-                case OpCode.SBC_AbsoluteX:
-                case OpCode.SBC_AbsoluteY:
-                case OpCode.SBC_ZeroPageIndirectX:
-                case OpCode.SBC_ZeroPageYIndirect:
 
                 default:
                     throw new Exception($"Unknown opcode: {opcode}");
             }
+        }
+
+        private byte Carry()
+        {
+            return (byte)((_flagRegister & ProcessorFlags.Carry) != 0 ? 1 : 0);
+        }
+
+        private byte Borrow()
+        {
+            return (byte)((_flagRegister & ProcessorFlags.Carry) != 0 ? 0 : 1);
         }
 
         private byte GetByte(ushort address, byte offset)
@@ -526,6 +574,7 @@ namespace _6502.Emulator.Processor
                 RegisterA = _registerA,
                 RegisterX = _registerX,
                 RegisterY = _registerY,
+                FlagRegister = (byte)_flagRegister,
                 StackPointer = _stackPointer,
                 CarryFlag = (_flagRegister & ProcessorFlags.Carry) != 0,
                 DecimalFlag = (_flagRegister & ProcessorFlags.Decimal) != 0,
