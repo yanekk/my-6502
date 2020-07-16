@@ -102,6 +102,39 @@ namespace _6502.Emulator.Processor
                     SetByte(GetUShort(), _registerX, v => (byte)(v << 1));
                     break;
 
+                case OpCode.BCC:
+                    if ((_flagRegister & ProcessorFlags.Carry) == 0)
+                        Branch();
+                    break;
+                case OpCode.BCS:
+                    if ((_flagRegister & ProcessorFlags.Carry) != 0)
+                        Branch();
+                    break;
+                case OpCode.BEQ:
+                    if ((_flagRegister & ProcessorFlags.Zero) != 0)
+                        Branch();
+                    break;
+                case OpCode.BMI:
+                    if ((_flagRegister & ProcessorFlags.Negative) != 0)
+                        Branch();
+                    break;
+                case OpCode.BNE:
+                    if ((_flagRegister & ProcessorFlags.Zero) == 0)
+                        Branch();
+                    break;
+                case OpCode.BPL:
+                    if ((_flagRegister & ProcessorFlags.Negative) == 0)
+                        Branch();
+                    break;
+                case OpCode.BVC:
+                    if ((_flagRegister & ProcessorFlags.Overflow) == 0)
+                        Branch();
+                    break;
+                case OpCode.BVS:
+                    if ((_flagRegister & ProcessorFlags.Overflow) != 0)
+                        Branch();
+                    break;
+
                 case OpCode.CLC:
                     _flagRegister &= ~ProcessorFlags.Carry;
                     break;
@@ -176,6 +209,13 @@ namespace _6502.Emulator.Processor
                     break;
                 case OpCode.INY:
                     _registerY++;
+                    break;
+
+                case OpCode.JMP_Absolute:
+                    _programCounter.Set(GetUShort());
+                    break;
+                case OpCode.JMP_Indirect:
+                    _programCounter.Set(GetUShort(GetUShort()));
                     break;
 
                 case OpCode.LDA_Immediate:
@@ -280,22 +320,18 @@ namespace _6502.Emulator.Processor
                     break;
 
                 case OpCode.PHA:
-                    _stack.Push(_registerA);
-                    _stackPointer--;
+                    Push(_registerA);
                     break;
 
                 case OpCode.PLA:
-                    _registerA = _stack.Pop();
-                    _stackPointer++;
+                    _registerA = Pull();
                     break;
 
                 case OpCode.PHP:
-                    _stack.Push((byte)_flagRegister);
-                    _stackPointer--;
+                    Push((byte)_flagRegister);
                     break;
                 case OpCode.PLP:
-                    _flagRegister = (ProcessorFlags)_stack.Pop();
-                    _stackPointer++;
+                    _flagRegister = (ProcessorFlags)Pull();
                     break;
 
                 case OpCode.ROL:
@@ -429,15 +465,6 @@ namespace _6502.Emulator.Processor
                 case OpCode.BRK:
                 case OpCode.JSR:
 
-                case OpCode.BCC:
-                case OpCode.BCS:
-                case OpCode.BEQ:
-                case OpCode.BMI:
-                case OpCode.BNE:
-                case OpCode.BPL:
-                case OpCode.BVC:
-                case OpCode.BVS:
-
                 case OpCode.BIT_ZeroPage:
                 case OpCode.BIT_Absolute:
 
@@ -458,15 +485,18 @@ namespace _6502.Emulator.Processor
                 case OpCode.CPY_ZeroPage:
                 case OpCode.CPY_Absolute:
 
-                case OpCode.JMP_Absolute:
-                case OpCode.JMP_Indirect:
-
                 case OpCode.RTI:
                 case OpCode.RTS:
 
                 default:
                     throw new Exception($"Unknown opcode: {opcode}");
             }
+        }
+
+        private void Branch()
+        {
+            ushort address = (ushort)(_programCounter.Current() - (byte.MaxValue - GetNextByte()));
+            _programCounter.Set(address);
         }
 
         private byte Carry()
@@ -553,6 +583,18 @@ namespace _6502.Emulator.Processor
             return v;
         }
 
+        private void Push(byte value)
+        {
+            _stack.Push(value);
+            _stackPointer--;
+        }
+
+        private byte Pull()
+        {
+            _stackPointer++;
+            return _stack.Pop();            
+        }
+
         internal ProcessorInternalState GetInternalState()
         {
             var memory = _chips.Keys
@@ -581,7 +623,8 @@ namespace _6502.Emulator.Processor
                 InterruptDisableFlag = (_flagRegister & ProcessorFlags.InterruptDisable) != 0,
                 OverflowFlag = (_flagRegister & ProcessorFlags.Overflow) != 0,
                 Memory = new MemoryInternalState(memory),
-                Stack = _stack.ToArray()
+                Stack = _stack.ToArray(),
+                ProgramCounter = _programCounter.Current()
             };
         }
 
@@ -599,6 +642,10 @@ namespace _6502.Emulator.Processor
                 _flagRegister |= ProcessorFlags.InterruptDisable;
             if (internalState.OverflowFlag)
                 _flagRegister |= ProcessorFlags.Overflow;
+            if (internalState.ZeroFlag)
+                _flagRegister |= ProcessorFlags.Zero;
+            if (internalState.NegativeFlag)
+                _flagRegister |= ProcessorFlags.Negative;
             _stack = new Stack<byte>(internalState.Stack);
         }
     }

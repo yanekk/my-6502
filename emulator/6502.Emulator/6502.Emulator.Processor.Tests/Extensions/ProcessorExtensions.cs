@@ -12,7 +12,8 @@ namespace _6502.Emulator.Processor.Tests.Extensions
 
         public static Processor6502 WithInternalState(this Processor6502 processor, 
             byte a = 0, byte x = 0, byte y = 0, byte stackPointer = 0,
-            bool carryFlag = false, bool decimalFlag = false, bool interruptDisableFlag = false, bool overflowFlag = false,
+            bool carryFlag = false, bool decimalFlag = false, bool interruptDisableFlag = false, 
+            bool overflowFlag = false, bool zeroFlag = false, bool negativeFlag = false,
             byte[] stack = default)
         {
             processor.SetInternalState(new ProcessorInternalState
@@ -25,6 +26,8 @@ namespace _6502.Emulator.Processor.Tests.Extensions
                 DecimalFlag = decimalFlag,
                 InterruptDisableFlag = interruptDisableFlag,
                 OverflowFlag = overflowFlag,
+                ZeroFlag = zeroFlag,
+                NegativeFlag = negativeFlag,
                 Stack = stack == default ? new byte[] { } : stack
             });
             return processor;

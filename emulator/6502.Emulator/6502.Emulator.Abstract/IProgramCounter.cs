@@ -4,5 +4,6 @@
     {
         void Set(ushort address);
         ushort Next();
+        ushort Current();
     }
 }

@@ -36,6 +36,11 @@ namespace _6502.Emulator.Processor.Tests
             return _processor;
         }
 
+        protected void Tick(int count)
+        {
+            _testClock.Tick(count);
+        }
+
         protected void TickOnce()
         {
             _testClock.TickOnce();
@@ -94,6 +99,11 @@ namespace _6502.Emulator.Processor.Tests
         protected byte[] Stack()
         {
             return _processor.GetInternalState().Stack;
+        }
+
+        protected ushort ProgramCounter()
+        {
+            return _processor.GetInternalState().ProgramCounter;
         }
     }
 }

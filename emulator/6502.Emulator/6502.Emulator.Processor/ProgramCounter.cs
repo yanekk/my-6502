@@ -11,6 +11,11 @@ namespace _6502.Emulator.Processor
             _current = initialValue;
         }
 
+        public ushort Current()
+        {
+            return _current;
+        }
+
         public ushort Next()
         {
             return _current++;

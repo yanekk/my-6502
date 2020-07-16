@@ -11,110 +11,125 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
         public void JMP_Absolute()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.JMP_Absolute, 0x2A);
+                .WithMemoryChip(0x0000, (int)OpCode.JMP_Absolute, 0x05, 0x20);
 
             TickOnce();
-
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be(0x2005);
         }
 
         [Test]
         public void JMP_Indirect()
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.JMP_Indirect, 0x2A);
+                .WithMemoryChip(0x0000, (int)OpCode.JMP_Indirect, 0x00, 0x20)
+                .WithMemoryChip(0x2000, 0x40, 0x50);
 
             TickOnce();
-
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be(0x5040);
         }
 
-        [Test]
-        public void BVS()
+        [TestCase(true, 0x0001)]
+        [TestCase(false, 0x0003)]
+        public void BVS(bool overflowFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BVS, 0x2A);
+                .WithInternalState(overflowFlag: overflowFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BVS, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
 
-        [Test]
-        public void BVC()
+        [TestCase(false, 0x0001)]
+        [TestCase(true, 0x0003)]
+        public void BVC(bool overflowFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BVC, 0x2A);
+                .WithInternalState(overflowFlag: overflowFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BVC, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
 
-        [Test]
-        public void BPL()
+        [TestCase(false, 0x0001)]
+        [TestCase(true, 0x0003)]
+        public void BPL(bool negativeFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BPL, 0x2A);
+                .WithInternalState(negativeFlag: negativeFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BPL, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
 
-        [Test]
-        public void BNE()
+        [TestCase(false, 0x0001)]
+        [TestCase(true, 0x0003)]
+        public void BNE(bool zeroFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BNE, 0x2A);
+                .WithInternalState(zeroFlag: zeroFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BNE, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
 
-        [Test]
-        public void BMI()
+        [TestCase(true, 0x0001)]
+        [TestCase(false, 0x0003)]
+        public void BMI(bool negativeFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BMI, 0x2A);
+                .WithInternalState(negativeFlag: negativeFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BMI, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
 
-        [Test]
-        public void BEQ()
+        [TestCase(true, 0x0001)]
+        [TestCase(false, 0x0003)]
+        public void BEQ(bool zeroFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BEQ, 0x2A);
+                .WithInternalState(zeroFlag: zeroFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BEQ, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
 
-        [Test]
-        public void BCS()
+        [TestCase(true, 0x0001)]
+        [TestCase(false, 0x0003)]
+        public void BCS(bool carryFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BCS, 0x2A);
+                .WithInternalState(carryFlag: carryFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BCS, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
 
-        [Test]
-        public void BCC()
+        [TestCase(false, 0x0001)]
+        [TestCase(true, 0x0003)]
+        public void BCC(bool carryFlag, int programCounter)
         {
             HavingProcessor()
-                .WithMemoryChip(0x0000, (int)OpCode.BCC, 0x2A);
+                .WithInternalState(carryFlag: carryFlag)
+                .WithMemoryChip(0x0000, (int)OpCode.NOP, (int)OpCode.NOP, (int)OpCode.BCC, 0xFD, (int)OpCode.NOP);
 
-            TickOnce();
+            Tick(3);
 
-            RegisterA().Should().Be(0x2A);
+            ProgramCounter().Should().Be((ushort)programCounter);
         }
     }
 }
