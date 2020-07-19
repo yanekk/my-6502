@@ -35,7 +35,7 @@ namespace _6502.Emulator.Processor
                 {OpCode.ADC_ZeroPageIndirectX,  () => _alu.ADC(ZeroPageIndirectX())},
                 {OpCode.ADC_ZeroPageYIndirect,  () => _alu.ADC(ZeroPageYIndirect())},
 
-                {OpCode.AND_Immediate,          () => _alu.AND(GetNextByte())},
+                {OpCode.AND_Immediate,          () => _alu.AND(Immediate())},
                 {OpCode.AND_ZeroPage,           () => _alu.AND(ZeroPage())},
                 {OpCode.AND_ZeroPageX,          () => _alu.AND(ZeroPageX())},
                 {OpCode.AND_Absolute,           () => _alu.AND(Absolute())},
@@ -58,8 +58,8 @@ namespace _6502.Emulator.Processor
                 {OpCode.BMI,                    () => BranchIfSet(ProcessorFlags.Negative) },
                 {OpCode.BVC,                    () => BranchIfNotSet(ProcessorFlags.Overflow) },
                 {OpCode.BVS,                    () => BranchIfSet(ProcessorFlags.Overflow) },
-
-                {OpCode.CMP_Immediate,          () => _alu.CMP(GetNextByte())},
+                {OpCode.BRK,                    BRK },
+                {OpCode.CMP_Immediate,          () => _alu.CMP(Immediate())},
                 {OpCode.CMP_ZeroPage,           () => _alu.CMP(ZeroPage())},
                 {OpCode.CMP_ZeroPageX,          () => _alu.CMP(ZeroPageX())},
                 {OpCode.CMP_Absolute,           () => _alu.CMP(Absolute())},
@@ -68,11 +68,11 @@ namespace _6502.Emulator.Processor
                 {OpCode.CMP_ZeroPageIndirectX,  () => _alu.CMP(ZeroPageIndirectX())},
                 {OpCode.CMP_ZeroPageYIndirect,  () => _alu.CMP(ZeroPageYIndirect())},
 
-                {OpCode.CPX_Immediate,          () => _alu.CPX(GetNextByte())},
+                {OpCode.CPX_Immediate,          () => _alu.CPX(Immediate())},
                 {OpCode.CPX_ZeroPage,           () => _alu.CPX(ZeroPage())},
                 {OpCode.CPX_Absolute,           () => _alu.CPX(Absolute())},
 
-                {OpCode.CPY_Immediate,          () => _alu.CPY(GetNextByte())},
+                {OpCode.CPY_Immediate,          () => _alu.CPY(Immediate())},
                 {OpCode.CPY_ZeroPage,           () => _alu.CPY(ZeroPage())},
                 {OpCode.CPY_Absolute,           () => _alu.CPY(Absolute())},
 
@@ -89,7 +89,7 @@ namespace _6502.Emulator.Processor
                 {OpCode.DEX,                    () => _registers.X = _alu.DEC(_registers.X)},
                 {OpCode.DEY,                    () => _registers.Y = _alu.DEC(_registers.Y)},
 
-                {OpCode.EOR_Immediate,          () => _alu.EOR(GetNextByte())},
+                {OpCode.EOR_Immediate,          () => _alu.EOR(Immediate())},
                 {OpCode.EOR_ZeroPage,           () => _alu.EOR(ZeroPage())},
                 {OpCode.EOR_ZeroPageX,          () => _alu.EOR(ZeroPageX())},
                 {OpCode.EOR_Absolute,           () => _alu.EOR(Absolute())},
@@ -108,8 +108,9 @@ namespace _6502.Emulator.Processor
 
                 {OpCode.JMP_Absolute,           () => _programCounter.Set(GetUShort())},
                 {OpCode.JMP_Indirect,           () => _programCounter.Set(GetUShort(GetUShort()))},
+                {OpCode.JSR,                    () => JSR() },         
 
-                {OpCode.LDA_Immediate,          () => _alu.LDA(GetNextByte())},
+                {OpCode.LDA_Immediate,          () => _alu.LDA(Immediate())},
                 {OpCode.LDA_ZeroPage,           () => _alu.LDA(ZeroPage())},
                 {OpCode.LDA_ZeroPageX,          () => _alu.LDA(ZeroPageX())},
                 {OpCode.LDA_Absolute,           () => _alu.LDA(Absolute())},
@@ -118,13 +119,13 @@ namespace _6502.Emulator.Processor
                 {OpCode.LDA_ZeroPageIndirectX,  () => _alu.LDA(ZeroPageIndirectX())},
                 {OpCode.LDA_ZeroPageYIndirect,  () => _alu.LDA(ZeroPageYIndirect())},
 
-                {OpCode.LDX_Immediate,          () => _alu.LDX(GetNextByte())},
+                {OpCode.LDX_Immediate,          () => _alu.LDX(Immediate())},
                 {OpCode.LDX_ZeroPage,           () => _alu.LDX(ZeroPage())},
                 {OpCode.LDX_ZeroPageY,          () => _alu.LDX(GetByte(GetNextByte(), _registers.Y))},
                 {OpCode.LDX_Absolute,           () => _alu.LDX(Absolute())},
                 {OpCode.LDX_AbsoluteY,          () => _alu.LDX(AbsoluteY())},
                 
-                {OpCode.LDY_Immediate,          () => _alu.LDY(GetNextByte())},
+                {OpCode.LDY_Immediate,          () => _alu.LDY(Immediate())},
                 {OpCode.LDY_ZeroPage,           () => _alu.LDY(ZeroPage())},
                 {OpCode.LDY_ZeroPageX,          () => _alu.LDY(ZeroPageX())},
                 {OpCode.LDY_Absolute,           () => _alu.LDY(Absolute())},
@@ -138,7 +139,7 @@ namespace _6502.Emulator.Processor
 
                 {OpCode.NOP,                    () => { } },
 
-                { OpCode.ORA_Immediate,         () => _alu.ORA(GetNextByte())},
+                { OpCode.ORA_Immediate,         () => _alu.ORA(Immediate())},
                 { OpCode.ORA_ZeroPage,          () => _alu.ORA(ZeroPage())},
                 { OpCode.ORA_ZeroPageX,         () => _alu.ORA(ZeroPageX())},
                 { OpCode.ORA_Absolute,          () => _alu.ORA(Absolute())},
@@ -164,7 +165,10 @@ namespace _6502.Emulator.Processor
                 { OpCode.ROR_Absolute,          () => SetByte(GetUShort(), _alu.ROR)},
                 { OpCode.ROR_AbsoluteX,         () => SetByte(GetUShort(), _registers.X, _alu.ROR)},
 
-                { OpCode.SBC_Immediate,         () => _alu.SBC(GetNextByte())},
+                { OpCode.RTS,                   RTS },
+                { OpCode.RTI,                   RTI },
+
+                { OpCode.SBC_Immediate,         () => _alu.SBC(Immediate())},
                 { OpCode.SBC_ZeroPage,          () => _alu.SBC(ZeroPage())},
                 { OpCode.SBC_ZeroPageX,         () => _alu.SBC(ZeroPageX())},
                 { OpCode.SBC_Absolute,          () => _alu.SBC(Absolute())},
@@ -200,6 +204,51 @@ namespace _6502.Emulator.Processor
             };
         }
 
+        public Processor6502 AddChip(ushort address, IMemoryChip memoryChip)
+        {
+            _chips[new Range(address, address + memoryChip.Size-1)] = memoryChip;
+            return this;
+        }
+
+        private void RTS()
+        {
+            _programCounter.Set((ushort)(Pull() | Pull() << 8));
+        }
+
+        private void RTI()
+        {
+            _registers.Status = (ProcessorFlags)Pull();
+            _programCounter.Set((ushort)(Pull() | Pull() << 8));
+        }
+
+        private void BRK()
+        {
+            ushort next = _programCounter.Current();
+            _stack.Push((byte)((next & 0xFF00) / 255));
+            _stack.Push((byte)(next & 0x00FF));
+            _stack.Push((byte)_registers.Status);
+            
+            _programCounter.Set((ushort)(GetByte(0xFFFF) * 256 | GetByte(0xFFFE)));
+        }
+
+        private void JSR()
+        {
+            ushort subroutineAddress = GetUShort();
+            ushort next = _programCounter.Current();
+            _programCounter.Set(subroutineAddress);
+            _stack.Push((byte)((next & 0xFF00) / 255));
+            _stack.Push((byte)(next & 0x00FF));
+        }
+
+        private void Tick()
+        {
+            var opcode = (OpCode)GetNextByte();
+            if (!_opcodes.ContainsKey(opcode))
+                throw new Exception($"Unknown opcode: {opcode}");
+            _opcodes[opcode].Invoke();
+            return;
+        }
+
         private void BranchIfNotSet(ProcessorFlags flag)
         {
             BranchIf((_registers.Status & flag) == 0);
@@ -219,19 +268,44 @@ namespace _6502.Emulator.Processor
             _programCounter.Set(address);
         }
 
-        public Processor6502 AddChip(ushort address, IMemoryChip memoryChip)
+        private byte Immediate()
         {
-            _chips[new Range(address, address + memoryChip.Size)] = memoryChip;
-            return this;
+            return GetNextByte();
         }
 
-        private void Tick()
+        private byte ZeroPage()
         {
-            var opcode = (OpCode)GetNextByte();
-            if(!_opcodes.ContainsKey(opcode))
-                throw new Exception($"Unknown opcode: {opcode}");
-            _opcodes[opcode].Invoke();
-            return;
+            return GetByte(GetNextByte());
+        }
+
+        private byte ZeroPageX()
+        {
+            return GetByte(GetNextByte(), _registers.X);
+        }
+
+        private byte Absolute()
+        {
+            return GetByte(GetUShort());
+        }
+
+        private byte AbsoluteX()
+        {
+            return GetByte(GetUShort(), _registers.X);
+        }
+
+        private byte AbsoluteY()
+        {
+            return GetByte(GetUShort(), _registers.Y);
+        }
+
+        private byte ZeroPageIndirectX()
+        {
+            return GetByte(GetUShort(GetNextByte(_registers.X)));
+        }
+
+        private byte ZeroPageYIndirect()
+        {
+            return GetByte(GetUShort(GetNextByte()), _registers.Y);
         }
 
         private byte GetByte(ushort address, byte offset)
@@ -289,7 +363,7 @@ namespace _6502.Emulator.Processor
                 ushort start = ((ushort)range.Start.Value);
                 ushort end = ((ushort)range.End.Value);
 
-                if (start <= address && address < end)
+                if (start <= address && address <= end)
                     return (start, _chips[range]);
             }
             return (0, null);
@@ -307,46 +381,6 @@ namespace _6502.Emulator.Processor
             return _stack.Pop();            
         }
 
-        private byte Immediate()
-        {
-            return GetNextByte();
-        }
-
-        private byte ZeroPage()
-        {
-            return GetByte(GetNextByte());
-        }
-
-        private byte ZeroPageX()
-        {
-            return GetByte(GetNextByte(), _registers.X);
-        }
-
-        private byte Absolute()
-        {
-            return GetByte(GetUShort());
-        }
-
-        private byte AbsoluteX()
-        {
-            return GetByte(GetUShort(), _registers.X);
-        }
-
-        private byte AbsoluteY()
-        {
-            return GetByte(GetUShort(), _registers.Y);
-        }
-
-        private byte ZeroPageIndirectX()
-        {
-            return GetByte(GetUShort(GetNextByte(_registers.X)));
-        }
-
-        private byte ZeroPageYIndirect()
-        {
-            return GetByte(GetUShort(GetNextByte()), _registers.Y);
-        }
-
         internal ProcessorInternalState GetInternalState()
         {
             var memory = _chips.Keys
@@ -355,7 +389,7 @@ namespace _6502.Emulator.Processor
                     var chip = _chips[range];
                     var result = new List<KeyValuePair<ushort, byte>>();
 
-                    for (var address = range.Start.Value; address < range.End.Value; address++)
+                    for (var address = range.Start.Value; address <= range.End.Value; address++)
                     {
                         result.Add(new KeyValuePair<ushort, byte>((ushort)address, chip.Get((ushort)(address - range.Start.Value))));
                     }
@@ -400,7 +434,7 @@ namespace _6502.Emulator.Processor
                 _registers.Status |= ProcessorFlags.Zero;
             if (internalState.NegativeFlag)
                 _registers.Status |= ProcessorFlags.Negative;
-            _stack = new Stack<byte>(internalState.Stack);
+            _stack = new Stack<byte>(internalState.Stack.Reverse());
         }
     }
 }
