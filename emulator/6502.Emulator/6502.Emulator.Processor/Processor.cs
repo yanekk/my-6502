@@ -34,56 +34,57 @@ namespace _6502.Emulator.Processor
         private void Tick()
         {
             var opcode = (OpCode)GetNextByte();
+            byte? result = null;
             switch(opcode)
             {
                 case OpCode.ADC_Immediate:
-                    _registerA += (byte)(GetNextByte() + Carry());
+                    ADC(Immediate() + Carry());
                     break;
                 case OpCode.ADC_ZeroPage:
-                    _registerA += (byte)(GetByte(GetNextByte()) + Carry());
+                    ADC(ZeroPage() + Carry());
                     break;
                 case OpCode.ADC_ZeroPageX:
-                    _registerA += (byte)(GetByte(GetNextByte(), _registerX) + Carry());
+                    ADC(ZeroPageX() + Carry());
                     break;
                 case OpCode.ADC_Absolute:
-                    _registerA += (byte)(GetByte(GetUShort()) + Carry());
+                    ADC(Absolute() + Carry());
                     break;
                 case OpCode.ADC_AbsoluteX:
-                    _registerA += (byte)(GetByte(GetUShort(), _registerX) + Carry());
+                    ADC(AbsoluteX() + Carry());
                     break;
                 case OpCode.ADC_AbsoluteY:
-                    _registerA += (byte)(GetByte(GetUShort(), _registerY) + Carry());
+                    ADC(AbsoluteY() + Carry());
                     break;
                 case OpCode.ADC_ZeroPageIndirectX:
-                    _registerA += (byte)(GetByte(GetUShort(GetNextByte(_registerX))) + Carry());
+                    ADC(ZeroPageIndirectX() + Carry());
                     break;
                 case OpCode.ADC_ZeroPageYIndirect:
-                    _registerA += (byte)(GetByte(GetUShort(GetNextByte()), _registerY) + Carry());
+                    ADC(ZeroPageYIndirect() + Carry());
                     break;
 
                 case OpCode.AND_Immediate:
                     _registerA &= GetNextByte();
                     break;
                 case OpCode.AND_ZeroPage:
-                    _registerA &= GetByte(GetNextByte());
+                    _registerA &= ZeroPage();
                     break;
                 case OpCode.AND_ZeroPageX:
-                    _registerA &= GetByte(GetNextByte(), _registerX);
+                    _registerA &= ZeroPageX();
                     break;
                 case OpCode.AND_Absolute:
-                    _registerA &= GetByte(GetUShort());
+                    _registerA &= Absolute();
                     break;
                 case OpCode.AND_AbsoluteX:
-                    _registerA &= GetByte(GetUShort(), _registerX);
+                    _registerA &= AbsoluteX();
                     break;
                 case OpCode.AND_AbsoluteY:
-                    _registerA &= GetByte(GetUShort(), _registerY);
+                    _registerA &= AbsoluteY();
                     break;
                 case OpCode.AND_ZeroPageIndirectX:
-                    _registerA &= GetByte(GetUShort(GetNextByte(_registerX)));
+                    _registerA &= ZeroPageIndirectX();
                     break;
                 case OpCode.AND_ZeroPageYIndirect:
-                    _registerA &= GetByte(GetUShort(GetNextByte()), _registerY);
+                    _registerA &= ZeroPageYIndirect();
                     break;
 
                 case OpCode.ASL:
@@ -136,48 +137,48 @@ namespace _6502.Emulator.Processor
                     break;
 
                 case OpCode.CMP_Immediate:
-                    Compare(_registerA, GetNextByte());
+                    result = CMP(GetNextByte());
                     break;
                 case OpCode.CMP_ZeroPage:
-                    Compare(_registerA, GetByte(GetNextByte()));
+                    result = CMP(ZeroPage());
                     break;
                 case OpCode.CMP_ZeroPageX:
-                    Compare(_registerA, GetByte(GetNextByte(), _registerX));
+                    result = CMP(ZeroPageX());
                     break;
                 case OpCode.CMP_Absolute:
-                    Compare(_registerA, GetByte(GetUShort()));
+                    result = CMP(Absolute());
                     break;
                 case OpCode.CMP_AbsoluteX:
-                    Compare(_registerA, GetByte(GetUShort(), _registerX));
+                    result = CMP(AbsoluteX());
                     break;
                 case OpCode.CMP_AbsoluteY:
-                    Compare(_registerA, GetByte(GetUShort(), _registerY));
+                    result = CMP(AbsoluteY());
                     break;
                 case OpCode.CMP_ZeroPageIndirectX:
-                    Compare(_registerA, GetByte(GetUShort(GetNextByte(_registerX))));
+                    result = CMP(ZeroPageIndirectX());
                     break;
                 case OpCode.CMP_ZeroPageYIndirect:
-                    Compare(_registerA, GetByte(GetUShort(GetNextByte()), _registerY));
+                    result = CMP(ZeroPageYIndirect());
                     break;
 
                 case OpCode.CPX_Immediate:
-                    Compare(_registerX, GetNextByte());
+                    result = CPX(GetNextByte());
                     break;
                 case OpCode.CPX_ZeroPage:
-                    Compare(_registerX, GetByte(GetNextByte()));
+                    result = CPX(ZeroPage());
                     break;
                 case OpCode.CPX_Absolute:
-                    Compare(_registerX, GetByte(GetUShort()));
+                    result = CPX(Absolute());
                     break;
 
                 case OpCode.CPY_Immediate:
-                    Compare(_registerY, GetNextByte());
+                    result = CPY(GetNextByte());
                     break;
                 case OpCode.CPY_ZeroPage:
-                    Compare(_registerY, GetByte(GetNextByte()));
+                    result = CPY(ZeroPage());
                     break;
                 case OpCode.CPY_Absolute:
-                    Compare(_registerY, GetByte(GetUShort()));
+                    result = CPY(Absolute());
                     break;
 
                 case OpCode.CLC:
@@ -216,25 +217,25 @@ namespace _6502.Emulator.Processor
                     _registerA ^= GetNextByte();
                     break;
                 case OpCode.EOR_ZeroPage:
-                    _registerA ^= GetByte(GetNextByte());
+                    _registerA ^= ZeroPage();
                     break;
                 case OpCode.EOR_ZeroPageX:
-                    _registerA ^= GetByte(GetNextByte(), _registerX);
+                    _registerA ^= ZeroPageX();
                     break;
                 case OpCode.EOR_Absolute:
-                    _registerA ^= GetByte(GetUShort());
+                    _registerA ^= Absolute();
                     break;
                 case OpCode.EOR_AbsoluteX:
-                    _registerA ^= GetByte(GetUShort(), _registerX);
+                    _registerA ^= AbsoluteX();
                     break;
                 case OpCode.EOR_AbsoluteY:
-                    _registerA ^= GetByte(GetUShort(), _registerY);
+                    _registerA ^= AbsoluteY();
                     break;
                 case OpCode.EOR_ZeroPageIndirectX:
-                    _registerA ^= GetByte(GetUShort(GetNextByte(_registerX)));
+                    _registerA ^= ZeroPageIndirectX();
                     break;
                 case OpCode.EOR_ZeroPageYIndirect:
-                    _registerA ^= GetByte(GetUShort(GetNextByte()), _registerY);
+                    _registerA ^= ZeroPageYIndirect();
                     break;
 
                 case OpCode.INC_ZeroPage:
@@ -267,57 +268,57 @@ namespace _6502.Emulator.Processor
                     _registerA = GetNextByte();
                     break;
                 case OpCode.LDA_ZeroPage:
-                    _registerA = GetByte(GetNextByte());
+                    _registerA = ZeroPage();
                     break;
                 case OpCode.LDA_ZeroPageX:
-                    _registerA = GetByte(GetNextByte(), _registerX);
+                    _registerA = ZeroPageX();
                     break;
                 case OpCode.LDA_Absolute:
-                    _registerA = GetByte(GetUShort());
+                    _registerA = Absolute();
                     break;
                 case OpCode.LDA_AbsoluteX:
-                    _registerA = GetByte(GetUShort(), _registerX);
+                    _registerA = AbsoluteX();
                     break;
                 case OpCode.LDA_AbsoluteY:
-                    _registerA = GetByte(GetUShort(), _registerY);
+                    _registerA = AbsoluteY();
                     break;
                 case OpCode.LDA_ZeroPageIndirectX:
-                    _registerA = GetByte(GetUShort(GetNextByte(_registerX)));
+                    _registerA = ZeroPageIndirectX();
                     break;
                 case OpCode.LDA_ZeroPageYIndirect:
-                    _registerA = GetByte(GetUShort(GetNextByte()), _registerY);
+                    _registerA = ZeroPageYIndirect();
                     break;
 
                 case OpCode.LDX_Immediate:
                     _registerX = GetNextByte();
                     break;
                 case OpCode.LDX_ZeroPage:
-                    _registerX = GetByte(GetNextByte());
+                    _registerX = ZeroPage();
                     break;
                 case OpCode.LDX_ZeroPageY:
                     _registerX = GetByte(GetNextByte(), _registerY);
                     break;
                 case OpCode.LDX_Absolute:
-                    _registerX = GetByte(GetUShort());
+                    _registerX = Absolute();
                     break;
                 case OpCode.LDX_AbsoluteY:
-                    _registerX = GetByte(GetUShort(), _registerY);
+                    _registerX = AbsoluteY();
                     break;
 
                 case OpCode.LDY_Immediate:
                     _registerY = GetNextByte();
                     break;
                 case OpCode.LDY_ZeroPage:
-                    _registerY = GetByte(GetNextByte());
+                    _registerY = ZeroPage();
                     break;
                 case OpCode.LDY_ZeroPageX:
-                    _registerY = GetByte(GetNextByte(), _registerX);
+                    _registerY = ZeroPageX();
                     break;
                 case OpCode.LDY_Absolute:
-                    _registerY = GetByte(GetUShort());
+                    _registerY = Absolute();
                     break;
                 case OpCode.LDY_AbsoluteX:
-                    _registerY = GetByte(GetUShort(), _registerX);
+                    _registerY = AbsoluteX();
                     break;
 
                 case OpCode.LSR:
@@ -343,25 +344,25 @@ namespace _6502.Emulator.Processor
                     _registerA |= GetNextByte();
                     break;
                 case OpCode.ORA_ZeroPage:
-                    _registerA |= GetByte(GetNextByte());
+                    _registerA |= ZeroPage();
                     break;
                 case OpCode.ORA_ZeroPageX:
-                    _registerA |= GetByte(GetNextByte(), _registerX);
+                    _registerA |= ZeroPageX();
                     break;
                 case OpCode.ORA_Absolute:
-                    _registerA |= GetByte(GetUShort());
+                    _registerA |= Absolute();
                     break;
                 case OpCode.ORA_AbsoluteX:
-                    _registerA |= GetByte(GetUShort(), _registerX);
+                    _registerA |= AbsoluteX();
                     break;
                 case OpCode.ORA_AbsoluteY:
-                    _registerA |= GetByte(GetUShort(), _registerY);
+                    _registerA |= AbsoluteY();
                     break;
                 case OpCode.ORA_ZeroPageIndirectX:
-                    _registerA |= GetByte(GetUShort(GetNextByte(_registerX)));
+                    _registerA |= ZeroPageIndirectX();
                     break;
                 case OpCode.ORA_ZeroPageYIndirect:
-                    _registerA |= GetByte(GetUShort(GetNextByte()), _registerY);
+                    _registerA |= ZeroPageYIndirect();
                     break;
 
                 case OpCode.PHA:
@@ -415,25 +416,25 @@ namespace _6502.Emulator.Processor
                     _registerA -= (byte)(GetNextByte() + Borrow());
                     break;
                 case OpCode.SBC_ZeroPage:
-                    _registerA -= (byte)(GetByte(GetNextByte()) + Borrow());
+                    _registerA -= (byte)(ZeroPage() + Borrow());
                     break;
                 case OpCode.SBC_ZeroPageX:
-                    _registerA -= (byte)(GetByte(GetNextByte(), _registerX) + Borrow());
+                    _registerA -= (byte)(ZeroPageX() + Borrow());
                     break;
                 case OpCode.SBC_Absolute:
-                    _registerA -= (byte)(GetByte(GetUShort()) + Borrow());
+                    _registerA -= (byte)(Absolute() + Borrow());
                     break;
                 case OpCode.SBC_AbsoluteX:
-                    _registerA -= (byte)(GetByte(GetUShort(), _registerX) + Borrow());
+                    _registerA -= (byte)(AbsoluteX() + Borrow());
                     break;
                 case OpCode.SBC_AbsoluteY:
-                    _registerA -= (byte)(GetByte(GetUShort(), _registerY) + Borrow());
+                    _registerA -= (byte)(AbsoluteY() + Borrow());
                     break;
                 case OpCode.SBC_ZeroPageIndirectX:
-                    _registerA -= (byte)(GetByte(GetUShort(GetNextByte(_registerX))) + Borrow());
+                    _registerA -= (byte)(ZeroPageIndirectX() + Borrow());
                     break;
                 case OpCode.SBC_ZeroPageYIndirect:
-                    _registerA -= (byte)(GetByte(GetUShort(GetNextByte()), _registerY) + Borrow());
+                    _registerA -= (byte)(ZeroPageYIndirect() + Borrow());
                     break;
 
                 case OpCode.SEC:
@@ -519,6 +520,17 @@ namespace _6502.Emulator.Processor
                 default:
                     throw new Exception($"Unknown opcode: {opcode}");
             }
+
+            if (result == null)
+                result = _registerA;
+
+            _flagRegister = (result == 0)
+                ? _flagRegister | ProcessorFlags.Zero
+                : _flagRegister & ~ProcessorFlags.Zero;
+
+            _flagRegister = (result & 1 << 7) != 0
+                ? _flagRegister | ProcessorFlags.Negative
+                : _flagRegister & ~ProcessorFlags.Negative;
         }
 
         private void Branch()
@@ -623,31 +635,84 @@ namespace _6502.Emulator.Processor
             return _stack.Pop();            
         }
 
-        private void Compare(byte reg, byte mem)
+        private byte CPX(byte mem)
         {
-            var negativeFlag = ((byte)(reg - mem) & 1 << 7) != 0 ? true : false;
-            _flagRegister &= ~(ProcessorFlags.Zero);
+            return CMP(_registerX, mem);
+        }
+
+        private byte CPY(byte mem)
+        {
+            return CMP(_registerY, mem);
+        }
+
+        private byte CMP(byte mem)
+        {
+            return CMP(_registerA, mem);
+        }
+
+        private byte CMP(byte reg, byte mem)
+        {
+            byte result = (byte)(reg - mem);
             _flagRegister &= ~(ProcessorFlags.Carry);
-
-            if (negativeFlag)
-            {
-                _flagRegister |= ProcessorFlags.Negative;
-            } else
-            {
-                _flagRegister &= ~(ProcessorFlags.Negative);
-            }
-
             if(reg > mem)
             {
                 _flagRegister |= ProcessorFlags.Carry;
-                return;
+                return result;
             }
             if (reg < mem)
-                return;
+                return result;
 
-            _flagRegister &= ~(ProcessorFlags.Negative);
-            _flagRegister |= ProcessorFlags.Zero;
             _flagRegister |= ProcessorFlags.Carry;
+
+            return result;
+        }
+
+        private void ADC(int value)
+        {
+            byte beforeAddition = _registerA;
+            _registerA += (byte)value;
+            if (beforeAddition > _registerA)
+                _flagRegister |= ProcessorFlags.Carry;
+        }
+
+        private byte Immediate()
+        {
+            return GetNextByte();
+        }
+
+        private byte ZeroPage()
+        {
+            return GetByte(GetNextByte());
+        }
+
+        private byte ZeroPageX()
+        {
+            return GetByte(GetNextByte(), _registerX);
+        }
+
+        private byte Absolute()
+        {
+            return GetByte(GetUShort());
+        }
+
+        private byte AbsoluteX()
+        {
+            return GetByte(GetUShort(), _registerX);
+        }
+
+        private byte AbsoluteY()
+        {
+            return GetByte(GetUShort(), _registerY);
+        }
+
+        private byte ZeroPageIndirectX()
+        {
+            return GetByte(GetUShort(GetNextByte(_registerX)));
+        }
+
+        private byte ZeroPageYIndirect()
+        {
+            return GetByte(GetUShort(GetNextByte()), _registerY);
         }
 
         internal ProcessorInternalState GetInternalState()

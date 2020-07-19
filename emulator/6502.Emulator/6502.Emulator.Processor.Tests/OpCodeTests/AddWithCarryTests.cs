@@ -7,6 +7,21 @@ namespace _6502.Emulator.Processor.Tests.OpCodeTests
     [TestFixture]
     internal class AddWithCarryTests : BaseTests
     {
+        [TestCase(0x01, 0xFF, true, true, false)]
+        [TestCase(0x01, 0xFE, false, false, true)]
+        public void ADC_Flags(byte a, byte m, bool zeroFlag, bool carryFlag, bool negativeFlag)
+        {
+            HavingProcessor()
+                .WithInternalState(a: a)
+                .WithMemoryChip(0x0000, (int)OpCode.ADC_Immediate, m);
+
+            TickOnce();
+
+            CarryFlag().Should().Be(carryFlag);
+            ZeroFlag().Should().Be(zeroFlag);
+            NegativeFlag().Should().Be(negativeFlag);
+        }
+
         [TestCase(false, 0x14)]
         [TestCase(true, 0x15)]
         public void ADC_Immediate(bool carryFlag, byte result)
