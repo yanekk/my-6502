@@ -12,10 +12,9 @@ namespace _6502.Emulator.Processor
 
         private byte _stackPointer = 0xFF;
         private RegisterManager _registers;
-
         private Stack<byte> _stack = new Stack<byte>();
-
         private Dictionary<Range, IMemoryChip> _chips = new Dictionary<Range, IMemoryChip>();
+
         private readonly Dictionary<OpCode, Action> _opcodes;
 
         public Processor6502(IClock clock, IProgramCounter programCounter)
@@ -208,6 +207,11 @@ namespace _6502.Emulator.Processor
         {
             _chips[new Range(address, address + memoryChip.Size-1)] = memoryChip;
             return this;
+        }
+
+        public void Initialize()
+        {
+            _programCounter.Set((ushort)(GetByte(0xFFFD) * 256 | GetByte(0xFFFC)));
         }
 
         private void RTS()

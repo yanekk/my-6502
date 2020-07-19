@@ -1,7 +1,7 @@
 ﻿using _6502.Emulator.Abstract;
 using System;
 
-namespace _6502.Emulator.Processor.Tests.TestDoubles
+namespace _6502.Emulator.Tests.Shared
 {
     public class TestClock : IClock
     {

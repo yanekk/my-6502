@@ -1,10 +1,10 @@
-﻿using _6502.Emulator.Processor.Tests.TestDoubles;
+﻿using _6502.Emulator.Processor;
 using NUnit.Framework;
 using System;
 
-namespace _6502.Emulator.Processor.Tests
+namespace _6502.Emulator.Tests.Shared
 {
-    internal abstract class BaseTests
+    public abstract class BaseTests
     {
         private TestClock _testClock;
         private Processor6502 _processor;

@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <RootNamespace>_6502.Emulator.Processor.Tests</RootNamespace>
+    <RootNamespace>_6502.Emulator.Integration.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -15,9 +15,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\6502.Emulator.Abstract\6502.Emulator.Abstract.csproj" />
+    <ProjectReference Include="..\6502.Emulator.Chips\6502.Emulator.Chips.csproj" />
     <ProjectReference Include="..\6502.Emulator.Processor\6502.Emulator.Processor.csproj" />
     <ProjectReference Include="..\6502.Emulator.Tests.Shared\6502.Emulator.Tests.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="test.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

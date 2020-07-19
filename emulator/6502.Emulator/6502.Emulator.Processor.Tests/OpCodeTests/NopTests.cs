@@ -1,4 +1,5 @@
 ﻿using _6502.Emulator.Processor.Tests.Extensions;
+using _6502.Emulator.Tests.Shared;
 using NUnit.Framework;
 
 namespace _6502.Emulator.Processor.Tests.OpCodeTests

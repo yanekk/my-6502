@@ -6,7 +6,7 @@ namespace _6502.Emulator.Processor
     {
         public ushort Size => _size;
 
-        private const ushort _size = 32768;
+        private const ushort _size = 16384;
         private readonly byte[] _memory = new byte[_size];
 
         public byte Get(ushort address)
