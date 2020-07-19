@@ -13,11 +13,6 @@ namespace _6502.Emulator.Processor
         private byte _stackPointer = 0xFF;
         private RegisterManager _registers;
 
-        private byte _registerA { get => _registers.A; set => _registers.A = value; }
-        private byte _registerX { get => _registers.X; set => _registers.X = value; }
-        private byte _registerY { get => _registers.Y; set => _registers.Y = value; }
-        private ProcessorFlags _flagRegister { get => _registers.Status; set => _registers.Status = value; }
-
         private Stack<byte> _stack = new Stack<byte>();
 
         private Dictionary<Range, IMemoryChip> _chips = new Dictionary<Range, IMemoryChip>();
@@ -49,11 +44,11 @@ namespace _6502.Emulator.Processor
                 {OpCode.AND_ZeroPageIndirectX,  () => _alu.AND(ZeroPageIndirectX())},
                 {OpCode.AND_ZeroPageYIndirect,  () => _alu.AND(ZeroPageYIndirect())},
 
-                {OpCode.ASL,                    () => _registerA = _alu.ASL(_registerA)},
+                {OpCode.ASL,                    () => _registers.A = _alu.ASL(_registers.A)},
                 {OpCode.ASL_ZeroPage,           () => SetByte(GetNextByte(), _alu.ASL)},
-                {OpCode.ASL_ZeroPageX,          () => SetByte(GetNextByte(), _registerX, _alu.ASL)},
+                {OpCode.ASL_ZeroPageX,          () => SetByte(GetNextByte(), _registers.X, _alu.ASL)},
                 {OpCode.ASL_Absolute,           () => SetByte(GetUShort(), _alu.ASL)},
-                {OpCode.ASL_AbsoluteX,          () => SetByte(GetUShort(), _registerX, _alu.ASL)},
+                {OpCode.ASL_AbsoluteX,          () => SetByte(GetUShort(), _registers.X, _alu.ASL)},
 
                 {OpCode.BCC,                    () => BranchIfNotSet(ProcessorFlags.Carry) },
                 {OpCode.BCS,                    () => BranchIfSet(ProcessorFlags.Carry) },
@@ -81,18 +76,18 @@ namespace _6502.Emulator.Processor
                 {OpCode.CPY_ZeroPage,           () => _alu.CPY(ZeroPage())},
                 {OpCode.CPY_Absolute,           () => _alu.CPY(Absolute())},
 
-                {OpCode.CLC,                    () => _flagRegister &= ~ProcessorFlags.Carry},
-                {OpCode.CLD,                    () => _flagRegister &= ~ProcessorFlags.Decimal},
-                {OpCode.CLI,                    () => _flagRegister &= ~ProcessorFlags.InterruptDisable},
-                {OpCode.CLV,                    () => _flagRegister &= ~ProcessorFlags.Overflow},
+                {OpCode.CLC,                    () => _registers.Status &= ~ProcessorFlags.Carry},
+                {OpCode.CLD,                    () => _registers.Status &= ~ProcessorFlags.Decimal},
+                {OpCode.CLI,                    () => _registers.Status &= ~ProcessorFlags.InterruptDisable},
+                {OpCode.CLV,                    () => _registers.Status &= ~ProcessorFlags.Overflow},
 
                 {OpCode.DEC_ZeroPage,           () => SetByte(GetNextByte(), _alu.DEC)},
-                {OpCode.DEC_ZeroPageX,          () => SetByte(GetNextByte(), _registerX, _alu.DEC)},
+                {OpCode.DEC_ZeroPageX,          () => SetByte(GetNextByte(), _registers.X, _alu.DEC)},
                 {OpCode.DEC_Absolute,           () => SetByte(GetUShort(), _alu.DEC)},
-                {OpCode.DEC_AbsoluteX,          () => SetByte(GetUShort(), _registerX, _alu.DEC)},
+                {OpCode.DEC_AbsoluteX,          () => SetByte(GetUShort(), _registers.X, _alu.DEC)},
 
-                {OpCode.DEX,                    () => _registerX = _alu.DEC(_registers.X)},
-                {OpCode.DEY,                    () => _registerY = _alu.DEC(_registers.Y)},
+                {OpCode.DEX,                    () => _registers.X = _alu.DEC(_registers.X)},
+                {OpCode.DEY,                    () => _registers.Y = _alu.DEC(_registers.Y)},
 
                 {OpCode.EOR_Immediate,          () => _alu.EOR(GetNextByte())},
                 {OpCode.EOR_ZeroPage,           () => _alu.EOR(ZeroPage())},
@@ -104,12 +99,12 @@ namespace _6502.Emulator.Processor
                 {OpCode.EOR_ZeroPageYIndirect,  () => _alu.EOR(ZeroPageYIndirect())},
 
                 {OpCode.INC_ZeroPage,           () => SetByte(GetNextByte(), _alu.INC)},
-                {OpCode.INC_ZeroPageX,          () => SetByte(GetNextByte(), _registerX, _alu.INC)},
+                {OpCode.INC_ZeroPageX,          () => SetByte(GetNextByte(), _registers.X, _alu.INC)},
                 {OpCode.INC_Absolute,           () => SetByte(GetUShort(), _alu.INC)},
-                {OpCode.INC_AbsoluteX,          () => SetByte(GetUShort(), _registerX, _alu.INC)},
+                {OpCode.INC_AbsoluteX,          () => SetByte(GetUShort(), _registers.X, _alu.INC)},
 
-                {OpCode.INX,                    () => _registerX = _alu.INC(_registerX)},
-                {OpCode.INY,                    () => _registerY = _alu.INC(_registerY)},
+                {OpCode.INX,                    () => _registers.X = _alu.INC(_registers.X)},
+                {OpCode.INY,                    () => _registers.Y = _alu.INC(_registers.Y)},
 
                 {OpCode.JMP_Absolute,           () => _programCounter.Set(GetUShort())},
                 {OpCode.JMP_Indirect,           () => _programCounter.Set(GetUShort(GetUShort()))},
@@ -125,7 +120,7 @@ namespace _6502.Emulator.Processor
 
                 {OpCode.LDX_Immediate,          () => _alu.LDX(GetNextByte())},
                 {OpCode.LDX_ZeroPage,           () => _alu.LDX(ZeroPage())},
-                {OpCode.LDX_ZeroPageY,          () => _alu.LDX(GetByte(GetNextByte(), _registerY))},
+                {OpCode.LDX_ZeroPageY,          () => _alu.LDX(GetByte(GetNextByte(), _registers.Y))},
                 {OpCode.LDX_Absolute,           () => _alu.LDX(Absolute())},
                 {OpCode.LDX_AbsoluteY,          () => _alu.LDX(AbsoluteY())},
                 
@@ -135,12 +130,14 @@ namespace _6502.Emulator.Processor
                 {OpCode.LDY_Absolute,           () => _alu.LDY(Absolute())},
                 {OpCode.LDY_AbsoluteX,          () => _alu.LDY(AbsoluteX())},
 
-                {OpCode.LSR,                    () => _registerA = _alu.LSR(_registerA)},
+                {OpCode.LSR,                    () => _registers.A = _alu.LSR(_registers.A)},
                 {OpCode.LSR_ZeroPage,           () => SetByte(GetNextByte(), _alu.LSR)},
-                {OpCode.LSR_ZeroPageX,          () => SetByte(GetNextByte(), _registerX, _alu.LSR)},
+                {OpCode.LSR_ZeroPageX,          () => SetByte(GetNextByte(), _registers.X, _alu.LSR)},
                 {OpCode.LSR_Absolute,           () => SetByte(GetUShort(), _alu.LSR)},
-                {OpCode.LSR_AbsoluteX,          () => SetByte(GetUShort(), _registerX, _alu.LSR)},
+                {OpCode.LSR_AbsoluteX,          () => SetByte(GetUShort(), _registers.X, _alu.LSR)},
+
                 {OpCode.NOP,                    () => { } },
+
                 { OpCode.ORA_Immediate,         () => _alu.ORA(GetNextByte())},
                 { OpCode.ORA_ZeroPage,          () => _alu.ORA(ZeroPage())},
                 { OpCode.ORA_ZeroPageX,         () => _alu.ORA(ZeroPageX())},
@@ -150,22 +147,22 @@ namespace _6502.Emulator.Processor
                 { OpCode.ORA_ZeroPageIndirectX, () => _alu.ORA(ZeroPageIndirectX())},
                 { OpCode.ORA_ZeroPageYIndirect, () => _alu.ORA(ZeroPageYIndirect())},
 
-                { OpCode.PHA,                   () => Push(_registerA)},
-                { OpCode.PLA,                   () => _registerA = Pull()},
-                { OpCode.PHP,                   () => Push((byte)_flagRegister)},
-                { OpCode.PLP,                   () => _flagRegister = (ProcessorFlags)Pull()},
+                { OpCode.PHA,                   () => Push(_registers.A)},
+                { OpCode.PLA,                   () => _registers.A = Pull()},
+                { OpCode.PHP,                   () => Push((byte)_registers.Status)},
+                { OpCode.PLP,                   () => _registers.Status = (ProcessorFlags)Pull()},
 
-                { OpCode.ROL,                   () => _registerA = _alu.ROL(_registerA)},
+                { OpCode.ROL,                   () => _registers.A = _alu.ROL(_registers.A)},
                 { OpCode.ROL_ZeroPage,          () => SetByte(GetNextByte(), _alu.ROL)},
-                { OpCode.ROL_ZeroPageX,         () => SetByte(GetNextByte(), _registerX, _alu.ROL)},
+                { OpCode.ROL_ZeroPageX,         () => SetByte(GetNextByte(), _registers.X, _alu.ROL)},
                 { OpCode.ROL_Absolute,          () => SetByte(GetUShort(), _alu.ROL)},
-                { OpCode.ROL_AbsoluteX,         () => SetByte(GetUShort(), _registerX, _alu.ROL)},
+                { OpCode.ROL_AbsoluteX,         () => SetByte(GetUShort(), _registers.X, _alu.ROL)},
 
-                { OpCode.ROR,                   () => _registerA = _alu.ROR(_registerA)},
+                { OpCode.ROR,                   () => _registers.A = _alu.ROR(_registers.A)},
                 { OpCode.ROR_ZeroPage,          () => SetByte(GetNextByte(), _alu.ROR)},
-                { OpCode.ROR_ZeroPageX,         () => SetByte(GetNextByte(), _registerX, _alu.ROR)},
+                { OpCode.ROR_ZeroPageX,         () => SetByte(GetNextByte(), _registers.X, _alu.ROR)},
                 { OpCode.ROR_Absolute,          () => SetByte(GetUShort(), _alu.ROR)},
-                { OpCode.ROR_AbsoluteX,         () => SetByte(GetUShort(), _registerX, _alu.ROR)},
+                { OpCode.ROR_AbsoluteX,         () => SetByte(GetUShort(), _registers.X, _alu.ROR)},
 
                 { OpCode.SBC_Immediate,         () => _alu.SBC(GetNextByte())},
                 { OpCode.SBC_ZeroPage,          () => _alu.SBC(ZeroPage())},
@@ -176,40 +173,41 @@ namespace _6502.Emulator.Processor
                 { OpCode.SBC_ZeroPageIndirectX, () => _alu.SBC(ZeroPageIndirectX())},
                 { OpCode.SBC_ZeroPageYIndirect, () => _alu.SBC(ZeroPageYIndirect())},
 
-                { OpCode.SEC,                   () => _flagRegister |= ProcessorFlags.Carry},
-                { OpCode.SED,                   () => _flagRegister |= ProcessorFlags.Decimal},
-                { OpCode.SEI,                   () => _flagRegister |= ProcessorFlags.InterruptDisable},
+                { OpCode.SEC,                   () => _registers.Status |= ProcessorFlags.Carry},
+                { OpCode.SED,                   () => _registers.Status |= ProcessorFlags.Decimal},
+                { OpCode.SEI,                   () => _registers.Status |= ProcessorFlags.InterruptDisable},
 
-                { OpCode.STA_ZeroPage,          () => SetByte(GetNextByte(), v => _registerA)},
-                { OpCode.STA_ZeroPageX,         () => SetByte(GetNextByte(), _registerX, v => _registerA)},
-                { OpCode.STA_Absolute,          () => SetByte(GetUShort(), v => _registerA)},
-                { OpCode.STA_AbsoluteX,         () => SetByte(GetUShort(), _registerX, v => _registerA)},
-                { OpCode.STA_AbsoluteY,         () => SetByte(GetUShort(), _registerY, v => _registerA)},
-                { OpCode.STA_ZeroPageIndirectX, () => SetByte(GetUShort(GetNextByte(_registerX)), v => _registerA)},
-                { OpCode.STA_ZeroPageYIndirect, () => SetByte(GetUShort(GetNextByte()), _registerY, v => _registerA)},
-                { OpCode.STX_ZeroPage,          () => SetByte(GetNextByte(), v => _registerX)},
-                { OpCode.STX_ZeroPageY,         () => SetByte(GetNextByte(), _registerY, v => _registerX)},
-                { OpCode.STX_Absolute,          () => SetByte(GetUShort(), v => _registerX)},
-                { OpCode.STY_ZeroPage,          () => SetByte(GetNextByte(), v => _registerY)},
-                { OpCode.STY_ZeroPageX,         () => SetByte(GetNextByte(), _registerX, v => _registerY)},
-                { OpCode.STY_Absolute,          () => SetByte(GetUShort(), v => _registerY)},
+                { OpCode.STA_ZeroPage,          () => SetByte(GetNextByte(), v => _registers.A)},
+                { OpCode.STA_ZeroPageX,         () => SetByte(GetNextByte(), _registers.X, v => _registers.A)},
+                { OpCode.STA_Absolute,          () => SetByte(GetUShort(), v => _registers.A)},
+                { OpCode.STA_AbsoluteX,         () => SetByte(GetUShort(), _registers.X, v => _registers.A)},
+                { OpCode.STA_AbsoluteY,         () => SetByte(GetUShort(), _registers.Y, v => _registers.A)},
+                { OpCode.STA_ZeroPageIndirectX, () => SetByte(GetUShort(GetNextByte(_registers.X)), v => _registers.A)},
+                { OpCode.STA_ZeroPageYIndirect, () => SetByte(GetUShort(GetNextByte()), _registers.Y, v => _registers.A)},
+                { OpCode.STX_ZeroPage,          () => SetByte(GetNextByte(), v => _registers.X)},
+                { OpCode.STX_ZeroPageY,         () => SetByte(GetNextByte(), _registers.Y, v => _registers.X)},
+                { OpCode.STX_Absolute,          () => SetByte(GetUShort(), v => _registers.X)},
+                { OpCode.STY_ZeroPage,          () => SetByte(GetNextByte(), v => _registers.Y)},
+                { OpCode.STY_ZeroPageX,         () => SetByte(GetNextByte(), _registers.X, v => _registers.Y)},
+                { OpCode.STY_Absolute,          () => SetByte(GetUShort(), v => _registers.Y)},
+
                 { OpCode.TAX,                   () => _alu.TAX()},
                 { OpCode.TAY,                   () => _alu.TAY()},
-                { OpCode.TSX,                   () => _registerX = _stackPointer},
+                { OpCode.TSX,                   () => _registers.X = _stackPointer},
                 { OpCode.TXA,                   () => _alu.TXA()},
-                { OpCode.TXS,                   () => _stackPointer = _registerX},
+                { OpCode.TXS,                   () => _stackPointer = _registers.X},
                 { OpCode.TYA,                   () => _alu.TYA()},
             };
         }
 
         private void BranchIfNotSet(ProcessorFlags flag)
         {
-            BranchIf((_flagRegister & flag) == 0);
+            BranchIf((_registers.Status & flag) == 0);
         }
 
         private void BranchIfSet(ProcessorFlags flag)
         {
-            BranchIf((_flagRegister & flag) != 0);
+            BranchIf((_registers.Status & flag) != 0);
         }
 
         private void BranchIf(bool condition)
@@ -321,7 +319,7 @@ namespace _6502.Emulator.Processor
 
         private byte ZeroPageX()
         {
-            return GetByte(GetNextByte(), _registerX);
+            return GetByte(GetNextByte(), _registers.X);
         }
 
         private byte Absolute()
@@ -331,22 +329,22 @@ namespace _6502.Emulator.Processor
 
         private byte AbsoluteX()
         {
-            return GetByte(GetUShort(), _registerX);
+            return GetByte(GetUShort(), _registers.X);
         }
 
         private byte AbsoluteY()
         {
-            return GetByte(GetUShort(), _registerY);
+            return GetByte(GetUShort(), _registers.Y);
         }
 
         private byte ZeroPageIndirectX()
         {
-            return GetByte(GetUShort(GetNextByte(_registerX)));
+            return GetByte(GetUShort(GetNextByte(_registers.X)));
         }
 
         private byte ZeroPageYIndirect()
         {
-            return GetByte(GetUShort(GetNextByte()), _registerY);
+            return GetByte(GetUShort(GetNextByte()), _registers.Y);
         }
 
         internal ProcessorInternalState GetInternalState()
@@ -367,17 +365,17 @@ namespace _6502.Emulator.Processor
 
             return new ProcessorInternalState
             {
-                RegisterA = _registerA,
-                RegisterX = _registerX,
-                RegisterY = _registerY,
-                FlagRegister = (byte)_flagRegister,
+                RegisterA = _registers.A,
+                RegisterX = _registers.X,
+                RegisterY = _registers.Y,
+                FlagRegister = (byte)_registers.Status,
                 StackPointer = _stackPointer,
-                CarryFlag = (_flagRegister & ProcessorFlags.Carry) != 0,
-                DecimalFlag = (_flagRegister & ProcessorFlags.Decimal) != 0,
-                InterruptDisableFlag = (_flagRegister & ProcessorFlags.InterruptDisable) != 0,
-                OverflowFlag = (_flagRegister & ProcessorFlags.Overflow) != 0,
-                ZeroFlag = (_flagRegister & ProcessorFlags.Zero) != 0,
-                NegativeFlag= (_flagRegister & ProcessorFlags.Negative) != 0,
+                CarryFlag = (_registers.Status & ProcessorFlags.Carry) != 0,
+                DecimalFlag = (_registers.Status & ProcessorFlags.Decimal) != 0,
+                InterruptDisableFlag = (_registers.Status & ProcessorFlags.InterruptDisable) != 0,
+                OverflowFlag = (_registers.Status & ProcessorFlags.Overflow) != 0,
+                ZeroFlag = (_registers.Status & ProcessorFlags.Zero) != 0,
+                NegativeFlag= (_registers.Status & ProcessorFlags.Negative) != 0,
                 Memory = new MemoryInternalState(memory),
                 Stack = _stack.ToArray(),
                 ProgramCounter = _programCounter.Current()
@@ -386,22 +384,22 @@ namespace _6502.Emulator.Processor
 
         internal void SetInternalState(ProcessorInternalState internalState)
         {
-            _registerA = internalState.RegisterA;
-            _registerX = internalState.RegisterX;
-            _registerY = internalState.RegisterY;
+            _registers.A = internalState.RegisterA;
+            _registers.X = internalState.RegisterX;
+            _registers.Y = internalState.RegisterY;
             _stackPointer = internalState.StackPointer;
             if (internalState.CarryFlag)
-                _flagRegister |= ProcessorFlags.Carry;
+                _registers.Status |= ProcessorFlags.Carry;
             if (internalState.DecimalFlag)
-                _flagRegister |= ProcessorFlags.Decimal;
+                _registers.Status |= ProcessorFlags.Decimal;
             if (internalState.InterruptDisableFlag)
-                _flagRegister |= ProcessorFlags.InterruptDisable;
+                _registers.Status |= ProcessorFlags.InterruptDisable;
             if (internalState.OverflowFlag)
-                _flagRegister |= ProcessorFlags.Overflow;
+                _registers.Status |= ProcessorFlags.Overflow;
             if (internalState.ZeroFlag)
-                _flagRegister |= ProcessorFlags.Zero;
+                _registers.Status |= ProcessorFlags.Zero;
             if (internalState.NegativeFlag)
-                _flagRegister |= ProcessorFlags.Negative;
+                _registers.Status |= ProcessorFlags.Negative;
             _stack = new Stack<byte>(internalState.Stack);
         }
     }
