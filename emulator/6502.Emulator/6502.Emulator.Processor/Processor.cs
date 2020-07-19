@@ -135,6 +135,51 @@ namespace _6502.Emulator.Processor
                         Branch();
                     break;
 
+                case OpCode.CMP_Immediate:
+                    Compare(_registerA, GetNextByte());
+                    break;
+                case OpCode.CMP_ZeroPage:
+                    Compare(_registerA, GetByte(GetNextByte()));
+                    break;
+                case OpCode.CMP_ZeroPageX:
+                    Compare(_registerA, GetByte(GetNextByte(), _registerX));
+                    break;
+                case OpCode.CMP_Absolute:
+                    Compare(_registerA, GetByte(GetUShort()));
+                    break;
+                case OpCode.CMP_AbsoluteX:
+                    Compare(_registerA, GetByte(GetUShort(), _registerX));
+                    break;
+                case OpCode.CMP_AbsoluteY:
+                    Compare(_registerA, GetByte(GetUShort(), _registerY));
+                    break;
+                case OpCode.CMP_ZeroPageIndirectX:
+                    Compare(_registerA, GetByte(GetUShort(GetNextByte(_registerX))));
+                    break;
+                case OpCode.CMP_ZeroPageYIndirect:
+                    Compare(_registerA, GetByte(GetUShort(GetNextByte()), _registerY));
+                    break;
+
+                case OpCode.CPX_Immediate:
+                    Compare(_registerX, GetNextByte());
+                    break;
+                case OpCode.CPX_ZeroPage:
+                    Compare(_registerX, GetByte(GetNextByte()));
+                    break;
+                case OpCode.CPX_Absolute:
+                    Compare(_registerX, GetByte(GetUShort()));
+                    break;
+
+                case OpCode.CPY_Immediate:
+                    Compare(_registerY, GetNextByte());
+                    break;
+                case OpCode.CPY_ZeroPage:
+                    Compare(_registerY, GetByte(GetNextByte()));
+                    break;
+                case OpCode.CPY_Absolute:
+                    Compare(_registerY, GetByte(GetUShort()));
+                    break;
+
                 case OpCode.CLC:
                     _flagRegister &= ~ProcessorFlags.Carry;
                     break;
@@ -462,28 +507,11 @@ namespace _6502.Emulator.Processor
                     _registerA = _registerY;
                     break;
 
-                case OpCode.BRK:
-                case OpCode.JSR:
-
                 case OpCode.BIT_ZeroPage:
                 case OpCode.BIT_Absolute:
 
-                case OpCode.CMP_Immediate:
-                case OpCode.CMP_ZeroPage:
-                case OpCode.CMP_ZeroPageX:
-                case OpCode.CMP_Absolute:
-                case OpCode.CMP_AbsoluteX:
-                case OpCode.CMP_AbsoluteY:
-                case OpCode.CMP_ZeroPageIndirectX:
-                case OpCode.CMP_ZeroPageYIndirect:
-
-                case OpCode.CPX_Immediate:
-                case OpCode.CPX_ZeroPage:
-                case OpCode.CPX_Absolute:
-
-                case OpCode.CPY_Immediate:
-                case OpCode.CPY_ZeroPage:
-                case OpCode.CPY_Absolute:
+                case OpCode.BRK:
+                case OpCode.JSR:
 
                 case OpCode.RTI:
                 case OpCode.RTS:
@@ -595,6 +623,33 @@ namespace _6502.Emulator.Processor
             return _stack.Pop();            
         }
 
+        private void Compare(byte reg, byte mem)
+        {
+            var negativeFlag = ((byte)(reg - mem) & 1 << 7) != 0 ? true : false;
+            _flagRegister &= ~(ProcessorFlags.Zero);
+            _flagRegister &= ~(ProcessorFlags.Carry);
+
+            if (negativeFlag)
+            {
+                _flagRegister |= ProcessorFlags.Negative;
+            } else
+            {
+                _flagRegister &= ~(ProcessorFlags.Negative);
+            }
+
+            if(reg > mem)
+            {
+                _flagRegister |= ProcessorFlags.Carry;
+                return;
+            }
+            if (reg < mem)
+                return;
+
+            _flagRegister &= ~(ProcessorFlags.Negative);
+            _flagRegister |= ProcessorFlags.Zero;
+            _flagRegister |= ProcessorFlags.Carry;
+        }
+
         internal ProcessorInternalState GetInternalState()
         {
             var memory = _chips.Keys
@@ -622,6 +677,8 @@ namespace _6502.Emulator.Processor
                 DecimalFlag = (_flagRegister & ProcessorFlags.Decimal) != 0,
                 InterruptDisableFlag = (_flagRegister & ProcessorFlags.InterruptDisable) != 0,
                 OverflowFlag = (_flagRegister & ProcessorFlags.Overflow) != 0,
+                ZeroFlag = (_flagRegister & ProcessorFlags.Zero) != 0,
+                NegativeFlag= (_flagRegister & ProcessorFlags.Negative) != 0,
                 Memory = new MemoryInternalState(memory),
                 Stack = _stack.ToArray(),
                 ProgramCounter = _programCounter.Current()

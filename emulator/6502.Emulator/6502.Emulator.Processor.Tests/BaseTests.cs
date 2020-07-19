@@ -96,6 +96,16 @@ namespace _6502.Emulator.Processor.Tests
             return _processor.GetInternalState().OverflowFlag;
         }
 
+        protected bool ZeroFlag()
+        {
+            return _processor.GetInternalState().ZeroFlag;
+        }
+
+        protected bool NegativeFlag()
+        {
+            return _processor.GetInternalState().NegativeFlag;
+        }
+
         protected byte[] Stack()
         {
             return _processor.GetInternalState().Stack;
