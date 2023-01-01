@@ -23,8 +23,8 @@ reset:
   LDA #0
   STA interrupt_timeout
 
-  call sub_lcd_initialize
-  call sub_lcd_clear
+;  call sub_lcd_initialize
+;  call sub_lcd_clear
 
   JSR CF_INIT
 

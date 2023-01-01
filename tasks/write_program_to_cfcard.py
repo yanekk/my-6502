@@ -7,6 +7,17 @@ import contextlib
 import math
 
 @contextlib.contextmanager
+def cf_card():
+  with open(fr"\\.\F:", 'r+b') as disk:
+    with lock_volume(disk):
+      yield disk
+
+@contextlib.contextmanager
+def cf_card_file(file_name):
+  with open(file_name, 'wb') as disk_file:
+    yield disk_file
+
+@contextlib.contextmanager
 def lock_volume(vol):
     hVol = msvcrt.get_osfhandle(vol.fileno())
     win32file.DeviceIoControl(hVol, winioctlcon.FSCTL_LOCK_VOLUME,
@@ -34,7 +45,6 @@ data = bytearray(dataSize)
 for i in range(len(contents)):
   data[i] = contents[i]
   
-with open(fr"\\.\F:", 'r+b') as disk:
-  with lock_volume(disk):
-    disk.seek(sectorNo * sectorSize)
-    disk.write(data)
+with cf_card_file("bin/cf_card.bin") as disk:
+  disk.seek(sectorNo * sectorSize)
+  disk.write(data)
