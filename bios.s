@@ -20,6 +20,7 @@ INIT  = $3e00
   
   .segment "CODE"
 reset:
+  CLD
   LDA #0
   STA interrupt_timeout
 
@@ -45,7 +46,7 @@ reset:
 irq_handler:
   LDA #1
   STA interrupt_timeout
-  BIT VIA_T1CL
+  STA VIA_T1CH
   RTI
 
   .segment "API"

@@ -14,15 +14,17 @@ init:
 
   ;call sub_lcd_clear
 
+;  LDA #<line1
+;  LDX #>line1
+;  call sub_lcd_write_line
+
+  LDA #<acia_initialized
+  LDX #>acia_initialized
+  call sub_acia_write_line
+
   LDA #<line1
   LDX #>line1
-  call sub_lcd_write_line
-
-  ;call sub_acia_initialize
-
-  ;LDA #<acia_initialized
-  ;LDX #>acia_initialized
-  ;call sub_acia_write_line
+  call sub_acia_write_line
 
   ;LDY #acia_write_line
   ;JSR call_subroutine
@@ -31,10 +33,10 @@ init:
 
   LDA #$00
   JSR dotmatrix_clear
-  JSR dotmatrix_splash_initialize
+  JSR dotmatrix_splash_reset
 
   ; initialize interrupt
-  lda #$ff
+  lda #$FF
   sta VIA_T1CL
   sta VIA_T1CH
   lda #%01000000 ; Continuous interrupts / no PB7 output
@@ -42,9 +44,13 @@ init:
   LDA #%11000000 ; enable T1
   STA VIA_IER
   CLI ; enable interrupts
+  JSR dotmatrix_splash
+  set_variable shift_line, #0
   JMP wait_for_interrupt
 
 splash:
+  ; JSR dotmatrix_move
+  JSR dotmatrix_splash_next_frame
   JSR dotmatrix_splash
   DEC shift_line
 
@@ -68,4 +74,4 @@ wait_for_interrupt:
   .INCLUDE "dotmatrix/dotmatrix.s"
   
 line1: .ASCIIZ "Program loaded"
-;acia_initialized: .ASCIIZ "ACIA initialized.\r\n"
+acia_initialized: .ASCIIZ "ACIA initialized.\r\n"

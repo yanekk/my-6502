@@ -6,10 +6,9 @@ current_segment_data_h = $07
 
 page = $09
 
-current_char = $0A
-current_char_h = $0B
-
-current_tile_h = $0C
+current_frame = $0A
+current_frame_h = $0B
+current_frame_index = $0C
 
 clear_value = $10
 
@@ -71,143 +70,60 @@ dotmatrix_clear:
 @clear_end:
   RTS
 
-;
-; dotmatrix_splash
-;
-dotmatrix_splash_initialize:
-  LDX #0
-@load_tile:
-  LDA tiles, X
-  STA tiles_h, X
-  ASL
-  ASL
-  ASL
-  ASL
-  STA tiles_l, X
-  INX
-  BNE @load_tile
+dotmatrix_move:
+  dotmatrix_set_segment DOTMATRIX_SEG1
+  LDA shift_line
+  ORA #command_start_line
+  STA (current_segment_command)
+
+  dotmatrix_set_segment DOTMATRIX_SEG2
+  LDA shift_line
+  ORA #command_start_line
+  STA (current_segment_command)
+  RTS
+
+dotmatrix_splash_reset:
+  copy_pointer moving_square_0, current_frame
+  set_variable current_frame_index, #0
+  RTS
+
+dotmatrix_splash_next_frame:
+  LDY #8
+@dotmatrix_splash_next_byte:
+  CLV
+
+  INC current_frame
+  BVC @dotmatrix_splash_next_byte_no_overflow
+  INC current_frame_h
+
+@dotmatrix_splash_next_byte_no_overflow:
+  DEY
+  CPY #0
+  BNE @dotmatrix_splash_next_byte
+
+  INC current_frame_index
+  LDA current_frame_index
+  CMP #8
+  BNE @dotmatrix_splash_next_frame_end
+  JSR dotmatrix_splash_reset
+@dotmatrix_splash_next_frame_end:
   RTS
 
 dotmatrix_splash:
-  copy_pointer splash_01, current_char
   set_variable page, #0
-  LDX #0 ; X ALWAYS contains current column
-
-@draw_next_char:
-  CPX #0 ; check if first column
-  BNE @check_if_half_of_screen
 
   dotmatrix_set_segment DOTMATRIX_SEG1
-
-  LDA shift_line
-  ORA #command_start_line
-  STA (current_segment_command)
-
   dotmatrix_set_page page
   dotmatrix_set_column #0
+  LDY #0 
 
-@check_if_half_of_screen:
-  CPX #16 ; switch to second segment
-  BNE @draw_char
-
-  dotmatrix_set_segment DOTMATRIX_SEG2
-
-  LDA shift_line
-  ORA #command_start_line
-  STA (current_segment_command)
-
-  dotmatrix_set_page page
-  dotmatrix_set_column #0
-
-@draw_char:
-  TXA
-  TAY
-  LDA (current_char), Y ; A contains relative address of upper tile first stripe
-  STA current_tile_h    ; current_tile_h contains relative address to upper tile first stripe
-
-  CLC
-  LDA #32               ; start loading second line
-  ADC index_map, X 
-  TAY                   ; Y contains column for second row
-
-  LDA (current_char), Y ; A contains relative address of lower tile first stripe
-  TAY                   ; Y contains relative address to upper tile first stripe
-
-  PHX
-
-  LDX current_tile_h
-  LDA tiles_h, X
-  ORA tiles_l, Y
+@draw_byte:
+  LDA (current_frame), Y
   STA (current_segment_data)
-
-  INX
   INY
-  LDA tiles_h, X
-  ORA tiles_l, Y
-  STA (current_segment_data)
-
-  INX
-  INY
-  LDA tiles_h, X
-  ORA tiles_l, Y
-  STA (current_segment_data)
-  
-  INX
-  INY
-  LDA tiles_h, X
-  ORA tiles_l, Y
-  STA (current_segment_data)
-
-  PLX
-  INX
-  
-  CPX #32
-  BNE @jmp_draw_next_char
-
-  LDY page
-  INY 
-  STY page
-  
   CPY #8
-  BEQ @finish_drawing
-
-  LDA lines_l, Y
-  STA current_char
-  LDA lines_h, Y
-  STA current_char+1
-
-  LDX #0
-@jmp_draw_next_char:
-  JMP @draw_next_char
-
-@finish_drawing:
+  BNE @draw_byte
   RTS
 
-index_map: .byte 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33
-
-splash_01: .byte 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4
-splash_02: .byte 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4
-splash_03: .byte 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4
-splash_04: .byte 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4
-splash_05: .byte 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4
-splash_06: .byte 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4
-splash_07: .byte 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4
-splash_08: .byte 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4
-splash_09: .byte 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4
-splash_10: .byte 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4
-splash_11: .byte 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4
-splash_12: .byte 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4
-splash_13: .byte 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4
-splash_14: .byte 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4
-splash_15: .byte 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4, 3 * 4, 4 * 4, 2 * 4
-splash_16: .byte 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4, 1 * 4, 4 * 4, 0 * 4
-
-lines_l: .byte <splash_01, <splash_03, <splash_05, <splash_07, <splash_09, <splash_11, <splash_13, <splash_15
-lines_h: .byte >splash_01, >splash_03, >splash_05, >splash_07, >splash_09, >splash_11, >splash_13, >splash_15
-
-tiles:
-tile_0: .byte %00000011, %00000111, %00001111, %00001111
-tile_1: .byte %00001111, %00001111, %00000111, %00000011
-tile_2: .byte %00001100, %00001110, %00001111, %00001111
-tile_3: .byte %00001111, %00001111, %00001110, %00001100
-tile_4: .byte %00000000, %00000000, %00000000, %00000000
+  .include "data/moving_square.s"
+  

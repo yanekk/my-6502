@@ -19,7 +19,7 @@ map_file="bin/$file_name.bin.lmap"
 rm -f "$binary_file"
 
 echo "Assembling $source_file..."
-ca65 --verbose -g --cpu 65C02 -I lib -o "$object_file" --feature string_escapes "$source_file"
+ca65 --verbose -g --cpu 65C02 -I lib -o "$object_file"  --feature string_escapes "$source_file"
 
 if [ $? -ne 0 ]; then 
   echo "Assembly failed." 
@@ -27,7 +27,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Linking $source_file..."
-cl65 -t none $memory_map_config -o "$binary_file" --mapfile "$map_file" -vm "$object_file"
+cl65 -t none $memory_map_config -o "$binary_file" -Ln "$map_file" -vm "$object_file"
 
 if [ $? -ne 0 ]; then 
   echo "Linking failed." 

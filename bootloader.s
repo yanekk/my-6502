@@ -5,14 +5,19 @@
 
 init:
   call sub_acia_initialize
-  call sub_lcd_initialize
-  call sub_lcd_clear
 
   LDA #<loading
   LDX #>loading
-  call sub_lcd_write_line
+  call sub_acia_write_line
 
-  LDA #$2
+;  call sub_lcd_initialize
+;  call sub_lcd_clear
+
+;  LDA #<loading
+;  LDX #>loading
+;  call sub_lcd_write_line
+
+  LDA #$3
   STA CFSECCO_BUFF
   LDA #$4
   STA CFLBA0_BUFF
@@ -24,7 +29,7 @@ init:
   LDY #>$0200
   JSR CF_READ_SECTOR
 
-  call sub_lcd_clear
+;  call sub_lcd_clear
 
   JMP $0200
 
