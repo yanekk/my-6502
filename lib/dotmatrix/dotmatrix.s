@@ -20,7 +20,9 @@ command_set_page   = %10111000
 command_start_line = %11000000
 command_set_column = %01000000
 
+  .include "dotmatrix.i"
   .include "dotmatrix/macros.s"
+  .include "../utils/macros.i"
 
 dotmatrix_initialize:
   dotmatrix_set_segment DOTMATRIX_SEG1
@@ -70,20 +72,22 @@ dotmatrix_clear:
 @clear_end:
   RTS
 
+dotmatrix_move_arg_shift_line: .byte 64
+
 dotmatrix_move:
   dotmatrix_set_segment DOTMATRIX_SEG1
-  LDA shift_line
+  LDA dotmatrix_move_arg_shift_line
   ORA #command_start_line
   STA (current_segment_command)
 
   dotmatrix_set_segment DOTMATRIX_SEG2
-  LDA shift_line
+  LDA dotmatrix_move_arg_shift_line
   ORA #command_start_line
   STA (current_segment_command)
   RTS
 
 dotmatrix_splash_reset:
-  copy_pointer moving_square_0, current_frame
+  copy_pointer star_0, current_frame
   set_variable current_frame_index, #0
   RTS
 
@@ -125,5 +129,5 @@ dotmatrix_splash:
   BNE @draw_byte
   RTS
 
-  .include "data/moving_square.s"
+  .include "data/star.s"
   

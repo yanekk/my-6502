@@ -15,7 +15,7 @@ INIT  = $3e00
   .include "lcd/lcd.s"
   .include "utils/wait.s"
   .include "acia/acia.s"
-  .include "utils/macros.s"
+  .include "utils/macros.i"
   .include "cfcard/cfcard.s"
   
   .segment "CODE"

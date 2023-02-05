@@ -1,5 +1,5 @@
   .include "cfcard/cfcard.h"
-  .include "utils/macros.s"
+  .include "utils/macros.i"
   .INCLUDE "bios.h"
   .ORG $3e00
 

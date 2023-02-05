@@ -1,3 +1,6 @@
+.IFNDEF __MACROS_I__
+__MACROS_I__ = 1
+
 .macro increment_variable var
   LDY var
   INY
@@ -23,3 +26,5 @@
   LDA value
   STA variable
 .endmacro
+
+.ENDIF
