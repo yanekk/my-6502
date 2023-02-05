@@ -1,19 +1,13 @@
-current_segment_command = $04
-current_segment_command_h = $05
+.zeropage
+current_segment_command: .addr 0
+current_segment_data: .addr 0
+page: .byte 0
 
-current_segment_data = $06
-current_segment_data_h = $07
-
-page = $09
-
-current_frame = $0A
-current_frame_h = $0B
-current_frame_index = $0C
+current_frame: .addr 0
+current_frame_index: .byte 0
+.code
 
 clear_value = $10
-
-tiles_h = $3d00
-tiles_l = $3f00
 
 command_turn_on    = %00111111
 command_set_page   = %10111000
@@ -96,9 +90,9 @@ dotmatrix_splash_next_frame:
 @dotmatrix_splash_next_byte:
   CLV
 
-  INC current_frame
+  INC <current_frame
   BVC @dotmatrix_splash_next_byte_no_overflow
-  INC current_frame_h
+  INC >current_frame
 
 @dotmatrix_splash_next_byte_no_overflow:
   DEY

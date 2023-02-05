@@ -11,7 +11,7 @@ build_bootloader:
 	sh scripts/assemble_file.sh -f bootloader.s
 
 build_program:
-	sh scripts/assemble_file.sh -f program.s
+	sh scripts/assemble_file.sh -f program.s -m program.map.cfg
 
 write_bootloader:
 	python .\tasks\write_program_to_cfcard.py .\bin\bootloader.bin 3

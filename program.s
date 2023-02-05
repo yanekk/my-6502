@@ -3,8 +3,6 @@
   .INCLUDE "bios.h"
   .INCLUDE "utils/macros.i"
 
-  .ORG $0200
-
 interrupt_timeout = $FD
 
 init:
