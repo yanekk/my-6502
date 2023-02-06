@@ -5,6 +5,13 @@
 
 interrupt_timeout = $FD
 
+.segment "INIT"
+program_start:
+jmp init
+
+.code
+  .INCLUDE "dotmatrix/dotmatrix.s"  
+
 init:
   ;LDY #lcd_initialize
   ;JSR call_subroutine
@@ -68,7 +75,8 @@ wait_for_interrupt:
 
   JMP splash
 
-  .INCLUDE "dotmatrix/dotmatrix.s"
+
+
   
 line1: .ASCIIZ "Program loaded"
 acia_initialized: .ASCIIZ "ACIA initialized.\r\n"

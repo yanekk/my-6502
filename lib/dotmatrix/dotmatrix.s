@@ -3,7 +3,7 @@ current_segment_command: .addr 0
 current_segment_data: .addr 0
 page: .byte 0
 
-current_frame: .addr 0
+current_frame: .addr 0, 0
 current_frame_index: .byte 0
 .code
 
@@ -90,9 +90,9 @@ dotmatrix_splash_next_frame:
 @dotmatrix_splash_next_byte:
   CLV
 
-  INC <current_frame
-  BVC @dotmatrix_splash_next_byte_no_overflow
-  INC >current_frame
+  INC current_frame
+  BNE @dotmatrix_splash_next_byte_no_overflow
+  INC current_frame+1
 
 @dotmatrix_splash_next_byte_no_overflow:
   DEY
