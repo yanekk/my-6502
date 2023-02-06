@@ -3,11 +3,12 @@ interrupt_timeout = $FD
 ptr1 = $FE
 ptr1_h = $FF
 
-  .include "cfcard/cfcard.h"
-  .include "via/via.h"
-  .include "lcd/lcd.h"
-  .include "acia/acia.h"
-  .include "bios.h"
+  .include "utils/macros.inc"
+  .include "cfcard/cfcard.inc"
+  .include "via/via.inc"
+  .include "lcd/lcd.inc"
+  .include "acia/acia.inc"
+  .include "bios.inc"
 
 INIT  = $3e00 
 
@@ -15,7 +16,6 @@ INIT  = $3e00
   .include "lcd/lcd.s"
   .include "utils/wait.s"
   .include "acia/acia.s"
-  .include "utils/macros.i"
   .include "cfcard/cfcard.s"
   
   .segment "CODE"

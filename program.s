@@ -1,7 +1,7 @@
-  .INCLUDE "dotmatrix/dotmatrix.i"
-  .INCLUDE "via/via.h"
-  .INCLUDE "bios.h"
-  .INCLUDE "utils/macros.i"
+.include "dotmatrix/dotmatrix.inc"
+.include "via/via.inc"
+.include "bios.inc"
+.include "utils/macros.inc"
 
 interrupt_timeout = $FD
 

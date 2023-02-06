@@ -14,9 +14,9 @@ command_set_page   = %10111000
 command_start_line = %11000000
 command_set_column = %01000000
 
-  .include "dotmatrix.i"
+  .include "dotmatrix.inc"
   .include "dotmatrix/macros.s"
-  .include "../utils/macros.i"
+  .include "../utils/macros.inc"
 
 dotmatrix_initialize:
   dotmatrix_set_segment DOTMATRIX_SEG1

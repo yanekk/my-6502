@@ -5,7 +5,7 @@ run:
 	H:/src/hbc-56/emulator/bin/hbc56emu.exe --rom "./bin/bios.bin" --cfcard "./bin/cf_card.bin"
 
 build_bios:
-	sh scripts/assemble_file.sh -f bios.s -m memory.map.cfg
+	sh scripts/assemble_file.sh -f bios.s -m bios.map.cfg
 
 build_bootloader:
 	sh scripts/assemble_file.sh -f bootloader.s

@@ -1,6 +1,6 @@
-  .include "cfcard/cfcard.h"
-  .include "utils/macros.i"
-  .INCLUDE "bios.h"
+  .include "cfcard/cfcard.inc"
+  .include "utils/macros.inc"
+  .INCLUDE "bios.inc"
   .ORG $3e00
 
 init:
