@@ -1,6 +1,6 @@
 import pytest
 
-from .source_code import SourceCode
+from .source_code import SourceCode, SourceFile
 
 @pytest.mark.parametrize(['include_path'], [
     ['lcd/lcd.s'], ['via/via.s']
@@ -13,7 +13,7 @@ def test_include(include_path):
     source_code.include(include_path)
 
     # assert
-    assert source_code == [f'  .include "{include_path}"']
+    assert str(source_code) == f'  .include "{include_path}"'
 
 def test_assign_byte_variable():
     # arrange
@@ -23,7 +23,7 @@ def test_assign_byte_variable():
     source_code.assign('R1', 123)
 
     # assert
-    assert source_code == [
+    assert str(source_code).splitlines() == [
         '  LDA #$7B',
         '  STA R1',
         '  LDA #$0',
@@ -38,7 +38,7 @@ def test_assign_word_variable():
     source_code.assign('R1', 0x1234)
 
     # assert
-    assert source_code == [
+    assert str(source_code).splitlines() == [
         '  LDA #$34',
         '  STA R1',
         '  LDA #$12',
@@ -56,7 +56,7 @@ def test_jump_to_subroutine(subroutine_name):
     source_code.jump_to_subroutine(subroutine_name)
 
     # assert
-    assert source_code == [f'  JSR {subroutine_name}']
+    assert str(source_code) == f'  JSR {subroutine_name}'
 
 @pytest.mark.parametrize(['label_name'], [
     ['my_first_label_name'], ['my_second_label_name']
@@ -69,7 +69,7 @@ def test_label(label_name):
     source_code.label(label_name)
 
     # assert
-    assert source_code == [f'{label_name}:']
+    assert str(source_code) == f'{label_name}:'
 
 def test_nop():
     # arrange
@@ -79,4 +79,73 @@ def test_nop():
     source_code.nop()
 
     # assert
-    assert source_code == [f'  NOP']
+    assert str(source_code) == f'  NOP'
+
+def test_word():
+    # arrange
+    source_code = SourceCode()
+
+    # act
+    source_code.word('label')
+
+    # assert
+    assert str(source_code) == f'  .word label'
+
+def test_source_file_stores_source_code_in_segment():
+    # arrange
+    source_file = SourceFile()
+
+    source_code = SourceCode()
+    source_code.word('label')
+
+    # act
+    source_file.append('INIT', source_code)
+
+    # assert
+    assert str(source_file).splitlines() == [
+        '  .segment "INIT"',
+        '  .word label'
+    ]
+
+def test_source_file_stores_multiple_sources_code_in_same_segment():
+    # arrange
+    source_file = SourceFile()
+
+    label_source_code = SourceCode()
+    label_source_code.word('label')
+
+    irq_handler_source_code = SourceCode()
+    irq_handler_source_code.word('irq_handler')
+
+    # act
+    source_file.append('INIT', label_source_code)
+    source_file.append('INIT', irq_handler_source_code)
+
+    # assert
+    assert str(source_file).splitlines() == [
+        '  .segment "INIT"',
+        '  .word label',
+        '  .word irq_handler'
+    ]
+
+def test_source_file_stores_multiple_sources_code_in_different_segment():
+    # arrange
+    source_file = SourceFile()
+
+    label_source_code = SourceCode()
+    label_source_code.word('label')
+
+    irq_handler_source_code = SourceCode()
+    irq_handler_source_code.word('irq_handler')
+
+    # act
+    source_file.append('INIT', label_source_code)
+    source_file.append('CODE', irq_handler_source_code)
+
+    # assert
+    assert str(source_file).splitlines() == [
+        '  .segment "INIT"',
+        '  .word label',
+        '  .segment "CODE"',
+        '  .word irq_handler'
+    ]
