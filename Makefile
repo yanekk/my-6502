@@ -2,7 +2,7 @@
 
 build: build_bios build_bootloader build_program write_cfcard_file convert_lmap_files
 run: 
-	H:/src/hbc-56/emulator/bin/hbc56emu.exe --rom "./bin/bios.bin" --cfcard "./bin/cf_card.bin"
+	H:/src/hbc-56/emulator/bin/hbc56emu.exe --brk --rom "./bin/bios.bin" --cfcard "./bin/cf_card.bin"
 
 build_bios:
 	sh scripts/assemble_file.sh -f bios.s -m bios.map.cfg
