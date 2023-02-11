@@ -29,6 +29,9 @@ class SourceCode:
     def word(self, label):
         self.__lines.append(f'  .word {label}')
 
+    def is_empty(self) -> bool:
+        return len(self.__lines) == 0
+
     def __str__(self) -> str:
         return '\n'.join(self.__lines)
 
@@ -43,6 +46,55 @@ class SourceFile:
         lines = []
         for segment, source_codes in self.__segments.items():
             lines.append(f'  .segment "{segment}"')
-            for source_code in source_codes:
+            non_empty_source_codes = [_ for _ in source_codes if not _.is_empty()]
+            for source_code in non_empty_source_codes:
                 lines.append(str(source_code))
         return '\n'.join(lines)
+
+class FixtureSourceFile:
+    def __init__(self, test_name):
+        self.__source_file = SourceFile()
+        
+        self.__includes_segment = SourceCode()
+        self.__source_file.append('CODE', self.__includes_segment)
+        
+        test_start_segment = SourceCode()
+        test_start_segment.label(f'{test_name}_start')
+        self.__source_file.append('CODE', test_start_segment)
+
+        self.__variable_assignment_segment = SourceCode()
+        self.__source_file.append('CODE', self.__variable_assignment_segment)
+
+        self.__test_code_segment = SourceCode()
+        self.__source_file.append('CODE', self.__test_code_segment)
+        
+        self.__code_segments: list[SourceCode] = [
+            self.__includes_segment,
+            self.__variable_assignment_segment,
+            self.__test_code_segment]
+
+        test_end_segment = SourceCode()
+        test_end_segment.label(f'{test_name}_end')
+        test_end_segment.nop()
+        self.__source_file.append('CODE', test_end_segment)
+
+        init_segment = SourceCode()
+        init_segment.word(f'{test_name}_start')
+        self.__source_file.append('INIT', init_segment)
+
+    def assign_variables(self, **variables):
+        for variable, value in variables.items():
+            self.__variable_assignment_segment.assign(variable, value)
+
+    def include_code(self, *source_file_paths):
+        for source_file_path in source_file_paths:
+            self.__includes_segment.include(source_file_path)
+
+    def jump_to_subroutine(self, subroutine_name):
+        self.__test_code_segment.jump_to_subroutine(subroutine_name)
+        
+    def __str__(self) -> str:
+        if all([_.is_empty() for _ in self.__code_segments]):
+            self.__test_code_segment.nop()
+
+        return str(self.__source_file)

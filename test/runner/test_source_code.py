@@ -1,6 +1,6 @@
 import pytest
 
-from .source_code import SourceCode, SourceFile
+from .source_code import SourceCode, SourceFile, FixtureSourceFile
 
 @pytest.mark.parametrize(['include_path'], [
     ['lcd/lcd.s'], ['via/via.s']
@@ -81,6 +81,21 @@ def test_nop():
     # assert
     assert str(source_code) == f'  NOP'
 
+def test_empty_source_code():
+    # arrange
+    source_code = SourceCode()
+
+    # assert
+    assert source_code.is_empty()
+
+def test_non_empty_source_code():
+    # arrange
+    source_code = SourceCode()
+    source_code.nop()
+
+    # assert
+    assert not source_code.is_empty()
+
 def test_word():
     # arrange
     source_code = SourceCode()
@@ -128,6 +143,25 @@ def test_source_file_stores_multiple_sources_code_in_same_segment():
         '  .word irq_handler'
     ]
 
+def test_source_file_empty_segments_are_ignored():
+    # arrange
+    source_file = SourceFile()
+
+    empty_segment = SourceCode()
+
+    irq_handler_source_code = SourceCode()
+    irq_handler_source_code.word('irq_handler')
+
+    # act
+    source_file.append('INIT', empty_segment)
+    source_file.append('INIT', irq_handler_source_code)
+
+    # assert
+    assert str(source_file).splitlines() == [
+        '  .segment "INIT"',
+        '  .word irq_handler'
+    ]
+
 def test_source_file_stores_multiple_sources_code_in_different_segment():
     # arrange
     source_file = SourceFile()
@@ -148,4 +182,101 @@ def test_source_file_stores_multiple_sources_code_in_different_segment():
         '  .word label',
         '  .segment "CODE"',
         '  .word irq_handler'
+    ]
+
+
+def test_fixture_source_file_builds_test_stub():
+    # arrange
+    fixture_source_file = FixtureSourceFile('test_name')
+
+    # act
+    assert str(fixture_source_file).splitlines() == [
+        '  .segment "CODE"',
+        'test_name_start:',
+        '  NOP',
+        'test_name_end:',
+        '  NOP',
+        '  .segment "INIT"',
+        '  .word test_name_start'
+    ]
+
+
+def test_fixture_source_file_variables_are_assigned():
+    # arrange
+    fixture_source_file = FixtureSourceFile('test_name')
+    fixture_source_file.assign_variables(
+        R1=0x12,
+        R2=0x23,
+    )
+    
+    # act
+    assert str(fixture_source_file).splitlines() == [
+        '  .segment "CODE"',
+        'test_name_start:',
+        '  LDA #$12',
+        '  STA R1',
+        '  LDA #$0',
+        '  STA R1+1',
+        '  LDA #$23',
+        '  STA R2',
+        '  LDA #$0',
+        '  STA R2+1',
+        'test_name_end:',
+        '  NOP',
+        '  .segment "INIT"',
+        '  .word test_name_start'
+    ]
+
+def test_fixture_source_file_includes_are_at_the_top():
+    # arrange
+    fixture_source_file = FixtureSourceFile('test_name')
+    fixture_source_file.assign_variables(
+        R1=0x12,
+    )
+
+    # act
+    fixture_source_file.include_code(
+        './common/zeropage.s',
+        './via/via.s'
+    )
+    
+    # assert
+    assert str(fixture_source_file).splitlines() == [
+        '  .segment "CODE"',
+        '  .include "./common/zeropage.s"',
+        '  .include "./via/via.s"',
+        'test_name_start:',
+        '  LDA #$12',
+        '  STA R1',
+        '  LDA #$0',
+        '  STA R1+1',
+        'test_name_end:',
+        '  NOP',
+        '  .segment "INIT"',
+        '  .word test_name_start'
+    ]
+
+def test_fixture_source_file_jsr_is_after_variable_assignment():
+    # arrange
+    fixture_source_file = FixtureSourceFile('test_name')
+
+    # act
+    fixture_source_file.jump_to_subroutine('subroutine_name')
+    fixture_source_file.assign_variables(
+        R1=0x12,
+    )
+
+    # assert
+    assert str(fixture_source_file).splitlines() == [
+        '  .segment "CODE"',
+        'test_name_start:',
+        '  LDA #$12',
+        '  STA R1',
+        '  LDA #$0',
+        '  STA R1+1',
+        '  JSR subroutine_name',
+        'test_name_end:',
+        '  NOP',
+        '  .segment "INIT"',
+        '  .word test_name_start'
     ]
