@@ -9,8 +9,8 @@ from .subprocess import ExecutionError, Subprocess
 @pytest.fixture
 def subprocess_mock():
     subprocess_mock = MagicMock(spec=Subprocess)
-    def return_valid_completed_process(*args, **kwargs):
-        return CompletedProcess(args=[], returncode=0, stdout='', stderr='')
+    def return_valid_completed_process(command: str, args: list[str]):
+        return CompletedProcess(args=args, returncode=0, stdout='', stderr='')
     subprocess_mock.run.side_effect = return_valid_completed_process
     return subprocess_mock
 
@@ -42,8 +42,8 @@ def test_emulator_command_arguments_are_passed_correctly(subprocess_mock: MagicM
 
 def test_emulator_command_raises_execution_error_on_nonzero_returncode(subprocess_mock: MagicMock):
     # arrange
-    def error_on_running_emulator(*args, **_):
-        return CompletedProcess(args=[], returncode=123, stdout='', stderr='')
+    def error_on_running_emulator(command: str, args: list[str]):
+        return CompletedProcess(args=args, returncode=123, stdout='', stderr='')
 
     subprocess_mock.run.side_effect = error_on_running_emulator
 
@@ -73,8 +73,8 @@ def test_emulator_command_raises_execution_error_on_nonzero_returncode(subproces
 
 def test_emulator_command_raises_execution_error_on_nonempty_stderr(subprocess_mock: MagicMock):
     # arrange
-    def error_on_running_emulator(*args, **_):
-        return CompletedProcess(args=[], returncode=0, stdout='', stderr='abcd')
+    def error_on_running_emulator(command: str, args: list[str]):
+        return CompletedProcess(args=args, returncode=0, stdout='', stderr='abcd')
 
     subprocess_mock.run.side_effect = error_on_running_emulator
 

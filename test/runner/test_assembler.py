@@ -10,8 +10,8 @@ from .subprocess import Subprocess, ExecutionError
 @pytest.fixture
 def subprocess_mock():
     subprocess_mock = MagicMock(spec=Subprocess)
-    def return_valid_completed_process(*args, **kwargs):
-        return CompletedProcess(args=[], returncode=0, stdout='', stderr='')
+    def return_valid_completed_process(command: str, args: list[str]):
+        return CompletedProcess(args=args, returncode=0, stdout='', stderr='')
     subprocess_mock.run.side_effect = return_valid_completed_process
     return subprocess_mock
 
@@ -41,9 +41,9 @@ def test_assembler_valid_file_ca65_returns_no_error(testdata_path: Path, subproc
 def test_assembler_invalid_file_returns_ca65_error_on_stderr(testdata_path: Path, subprocess_mock: Subprocess):
     # arrange
     expected_error = 'bios.s(3): Error: Unexpected trailing garbage characters'
-    def error_on_assembling(*args, **_):
-        if args[0] == 'ca65':
-            return CompletedProcess(args=[], returncode=123, stdout='', stderr=expected_error)
+    def error_on_assembling(command: str, args: list[str]):
+        if command == 'ca65':
+            return CompletedProcess(args=args, returncode=123, stdout='', stderr=expected_error)
 
     subprocess_mock.run.side_effect = error_on_assembling
     
@@ -64,9 +64,9 @@ def test_assembler_invalid_file_returns_ca65_error_on_stderr(testdata_path: Path
 
 def test_assembler_invalid_file_returns_ca65_error_on_nonzero_returncode(testdata_path: Path, subprocess_mock: Subprocess):
     # arrange
-    def error_on_assembling(*args, **_):
-        if args[0] == 'ca65':
-            return CompletedProcess(args=[], returncode=123, stdout='', stderr='')
+    def error_on_assembling(command: str, args: list[str]):
+        if command == 'ca65':
+            return CompletedProcess(args=args, returncode=123, stdout='', stderr='')
 
     subprocess_mock.run.side_effect = error_on_assembling
     
@@ -87,10 +87,10 @@ def test_assembler_invalid_file_returns_ca65_error_on_nonzero_returncode(testdat
 
 def test_assembler_invalid_file_returns_cl65_error_on_nonzero_returncode(testdata_path: Path, subprocess_mock: Subprocess):
     # arrange
-    def error_on_assembling(*args, **_):
-        if args[0] == 'cl65':
-            return CompletedProcess(args=[], returncode=123, stdout='', stderr='')
-        return CompletedProcess(args=[], returncode=0, stdout='', stderr='')
+    def error_on_assembling(command: str, args: list[str]):
+        if command == 'cl65':
+            return CompletedProcess(args=args, returncode=123, stdout='', stderr='')
+        return CompletedProcess(args=args, returncode=0, stdout='', stderr='')
 
     subprocess_mock.run.side_effect = error_on_assembling
     
@@ -112,10 +112,10 @@ def test_assembler_invalid_file_returns_cl65_error_on_nonzero_returncode(testdat
 def test_assembler_invalid_file_returns_cl65_error_on_stderr(testdata_path: Path, subprocess_mock: Subprocess):
     # arrange
     expected_error = 'bios.s(3): Error: Unexpected trailing garbage characters'
-    def error_on_assembling(*args, **_):
-        if args[0] == 'cl65':
-            return CompletedProcess(args=[], returncode=123, stdout='', stderr=expected_error)
-        return CompletedProcess(args=[], returncode=0, stdout='', stderr='')
+    def error_on_assembling(command: str, args: list[str]):
+        if command == 'cl65':
+            return CompletedProcess(args=args, returncode=123, stdout='', stderr=expected_error)
+        return CompletedProcess(args=args, returncode=0, stdout='', stderr='')
 
     subprocess_mock.run.side_effect = error_on_assembling
     

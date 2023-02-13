@@ -1,5 +1,5 @@
 from pathlib import Path
-from .subprocess import ExecutionError, Subprocess
+from .subprocess import Subprocess, has_execution_error, build_execution_error
 
 class Emulator:
     def __init__(self, subprocess: Subprocess):
@@ -12,9 +12,5 @@ class Emulator:
             '--exit-label', exit_label
         ]
         result = self.__subprocess.run('hbc56emu.exe', args)
-        if result.returncode > 0 or result.stderr:
-            raise ExecutionError(
-                command='hbc56emu.exe', 
-                command_args=args,
-                return_code=result.returncode,
-                stderr=result.stderr)
+        if has_execution_error(result):
+            raise build_execution_error('hbc56emu.exe', result)
