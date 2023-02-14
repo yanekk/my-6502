@@ -32,10 +32,10 @@ class ExecutionError(Exception):
 
         super().__init__(msg)
 
-def has_execution_error(completed_process: CompletedProcess):
+def has_subprocess_failed(completed_process: CompletedProcess):
     return completed_process.returncode != 0 or bool(completed_process.stderr)
 
-def build_execution_error(program_path: str, completed_process: CompletedProcess):
+def subprocess_execution_error(program_path: str, completed_process: CompletedProcess):
     return ExecutionError(
         command=program_path,
         stderr=completed_process.stderr,
