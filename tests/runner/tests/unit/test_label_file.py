@@ -1,6 +1,6 @@
 import io
 
-from .label_file import Label, LabelFile
+from runner.label_file import Label, LabelFile
 
 def test_parse_label():
     # arrange

@@ -1,11 +1,12 @@
 
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, call
-import pytest
 from pathlib import Path
 
-from .assembler import Assembler
-from .subprocess import Subprocess, ExecutionError
+import pytest
+
+from runner.assembler import Assembler
+from runner.subprocess import Subprocess, ExecutionError
 
 @pytest.fixture
 def subprocess_mock():

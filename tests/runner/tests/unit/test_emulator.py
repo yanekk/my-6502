@@ -3,8 +3,8 @@ from subprocess import CompletedProcess
 from pathlib import Path
 import pytest
 
-from .emulator import Emulator
-from .subprocess import ExecutionError, Subprocess
+from runner.emulator import Emulator
+from runner.subprocess import ExecutionError, Subprocess
 
 @pytest.fixture
 def subprocess_mock():

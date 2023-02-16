@@ -2,7 +2,7 @@ from subprocess import CompletedProcess
 
 import pytest
 
-from .subprocess import ExecutionError, has_subprocess_failed, subprocess_execution_error
+from runner.subprocess import ExecutionError, has_subprocess_failed, subprocess_execution_error
 
 def test_assembly_error_builds_message_with_stderr():
     # arrange

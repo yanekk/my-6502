@@ -1,6 +1,6 @@
 import pytest
 
-from .source_code import SourceCode, SourceFile, FixtureSourceFile
+from runner.source_code import SourceCode, SourceFile, FixtureSourceFile
 
 @pytest.mark.parametrize(['include_path'], [
     ['lcd/lcd.s'], ['via/via.s']
