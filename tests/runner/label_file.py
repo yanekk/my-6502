@@ -17,3 +17,6 @@ class LabelFile(UserList[Label]):
     @classmethod
     def parse(cls, buffer: io.TextIOWrapper):
         return LabelFile([Label.parse(label) for label in buffer.readlines()])
+
+    def address_at(self, label: str):
+        return [_ for _ in self if _.label == label][0].address
