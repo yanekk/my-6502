@@ -1,12 +1,15 @@
 from collections import defaultdict
+from pathlib import Path
+from typing import Union
 
 
 class SourceCode:
     def __init__(self):
         self.__lines = []
 
-    def include(self, file_path: str):
-        self.__lines.append(f'  .include "{file_path}"')
+    def include(self, file_path: Union[str, Path]):
+        normalized_path = str(file_path).replace('\\', '/')
+        self.__lines.append(f'  .include "{normalized_path}"')
 
     def assign(self, variable: str, value: int):
         lo_byte = value & 0x00FF
@@ -73,8 +76,9 @@ class FixtureSourceFile:
             self.__variable_assignment_segment,
             self.__test_code_segment]
 
+        self.exit_label = f'{test_name}_end'
         test_end_segment = SourceCode()
-        test_end_segment.label(f'{test_name}_end')
+        test_end_segment.label(self.exit_label)
         test_end_segment.nop()
         self.__source_file.append('CODE', test_end_segment)
 
@@ -86,7 +90,7 @@ class FixtureSourceFile:
         for variable, value in variables.items():
             self.__variable_assignment_segment.assign(variable, value)
 
-    def include_code(self, *source_file_paths):
+    def include_code(self, *source_file_paths: Union[str, Path]):
         for source_file_path in source_file_paths:
             self.__includes_segment.include(source_file_path)
 

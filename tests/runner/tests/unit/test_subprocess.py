@@ -49,8 +49,8 @@ def test_assembly_error_builds_message_without_stderr():
     ]
 
 @pytest.mark.parametrize(['returncode', 'stderr'], [
-    [1, ''],
-    [0, 'error']
+    [1, b''],
+    [0, b'error']
 ])
 def test_has_error_on_nonzero_exitcode(returncode, stderr):
     # arrange
@@ -68,7 +68,7 @@ def test_has_no_error_on_empty_stderr_and_zero_returncode():
 
 def test_builds_error_from_completed_process():
     # arrange
-    completed_process = CompletedProcess(['a', 'b', 'c'], 123, 'stdout', 'stderr')
+    completed_process = CompletedProcess(['a', 'b', 'c'], 123, b'stdout', b'stderr')
 
     # act
     error = subprocess_execution_error('program.exe', completed_process)

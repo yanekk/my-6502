@@ -7,8 +7,11 @@ class Assembler:
         self.__subprocess = subprocess
 
     def assemble(self, source_code_path: Path):
-        ca65_args = ['--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), str(source_code_path)]
-        completed_process = self.__subprocess.run('ca65', ca65_args)
+        work_dir = str(source_code_path.parent)
+        source_file = source_code_path.name
+        ca65_args = ['--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), source_file]
+
+        completed_process = self.__subprocess.run('ca65', ca65_args, work_dir)
         if has_subprocess_failed(completed_process):
             raise subprocess_execution_error('ca65', completed_process)
                 

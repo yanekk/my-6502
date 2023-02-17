@@ -1,6 +1,6 @@
 interrupt_timeout = $FD
 
-ptr1 = $FsE
+ptr1 = $FE
 ptr1_h = $FF
 
   .include "utils/macros.inc"

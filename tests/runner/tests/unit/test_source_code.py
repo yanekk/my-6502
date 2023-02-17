@@ -15,6 +15,20 @@ def test_include(include_path):
     # assert
     assert str(source_code) == f'  .include "{include_path}"'
 
+
+def test_include_backward_slashes_replacement():
+    # arrange
+    source_code = SourceCode()
+
+    actual_path = 'h:\\test\\test.s'
+    expected_path = 'h:/test/test.s'
+
+    # act
+    source_code.include(actual_path)
+
+    # assert
+    assert str(source_code) == f'  .include "{expected_path}"'
+
 def test_assign_byte_variable():
     # arrange
     source_code = SourceCode()
@@ -200,6 +214,12 @@ def test_fixture_source_file_builds_test_stub():
         '  .word test_name_start'
     ]
 
+def test_fixture_source_assigns_exit_label():
+    # arrange
+    fixture_source_file = FixtureSourceFile('test_name')
+
+    # act
+    assert fixture_source_file.exit_label == 'test_name_end'
 
 def test_fixture_source_file_variables_are_assigned():
     # arrange

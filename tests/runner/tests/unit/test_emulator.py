@@ -43,7 +43,7 @@ def test_emulator_command_arguments_are_passed_correctly(subprocess_mock: MagicM
 def test_emulator_command_raises_execution_error_on_nonzero_returncode(subprocess_mock: MagicMock):
     # arrange
     def error_on_running_emulator(command: str, args: list[str]):
-        return CompletedProcess(args=args, returncode=123, stdout='', stderr='')
+        return CompletedProcess(args=args, returncode=123, stdout='', stderr=b'')
 
     subprocess_mock.run.side_effect = error_on_running_emulator
 
@@ -74,7 +74,7 @@ def test_emulator_command_raises_execution_error_on_nonzero_returncode(subproces
 def test_emulator_command_raises_execution_error_on_nonempty_stderr(subprocess_mock: MagicMock):
     # arrange
     def error_on_running_emulator(command: str, args: list[str]):
-        return CompletedProcess(args=args, returncode=0, stdout='', stderr='abcd')
+        return CompletedProcess(args=args, returncode=0, stdout='', stderr=b'abcd')
 
     subprocess_mock.run.side_effect = error_on_running_emulator
 
