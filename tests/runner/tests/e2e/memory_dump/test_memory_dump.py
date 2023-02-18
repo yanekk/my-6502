@@ -9,9 +9,11 @@ def test_is_executed():
     # arrange
     emulator = Emulator(RealSubprocess())
     assembler = Assembler(RealSubprocess())
+    assembler.add_include_path('lib')
+    assembler.set_config_file('tests/runner/assets/test.map.cfg')
 
     source_code = FixtureSourceFile('actual_test_name')
-
+    source_code.include_code('zeropage.s')
     memory_dump_path = Path(__file__).parent / 'memory_dump.s'
     source_code.include_code(memory_dump_path)
     source_code.assign_variables(R1=123)

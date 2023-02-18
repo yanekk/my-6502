@@ -120,6 +120,42 @@ def test_word():
     # assert
     assert str(source_code) == f'  .word label'
 
+def test_source_file_stores_source_code_outside_segment():
+    # arrange
+    source_file = SourceFile()
+
+    source_code = SourceCode()
+    source_code.word('label')
+
+    # act
+    source_file.append(None, source_code)
+
+    # assert
+    assert str(source_file).splitlines() == [
+        '  .word label'
+    ]
+
+def test_source_file_stores_source_code_in_segment_after_segment_zero():
+    # arrange
+    source_file = SourceFile()
+
+    source_code_init = SourceCode()
+    source_code_init.word('segment_init_label')
+
+    source_code_zero = SourceCode()
+    source_code_zero.word('segment_zero_label')
+
+    # act
+    source_file.append('INIT', source_code_init)
+    source_file.append(None, source_code_zero)
+
+    # assert
+    assert str(source_file).splitlines() == [
+        '  .word segment_zero_label',
+        '  .segment "INIT"',
+        '  .word segment_init_label'
+    ]
+
 def test_source_file_stores_source_code_in_segment():
     # arrange
     source_file = SourceFile()

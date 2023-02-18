@@ -35,10 +35,47 @@ def test_assembler_valid_file_ca65_returns_no_error(testdata_path: Path, subproc
     assert subprocess_mock.run.call_count == 2
     subprocess_mock.run.assert_has_calls([
         call('ca65', ['--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), source_code_path.name], str(source_code_path.parent)),
-        call('cl65', ['-t', 'none', '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))])
+        call('cl65', ['-t', 'none',  '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))])
     ])
 
+def test_assembler_add_include_relative_path_adds_i_argument_with_resolved_path(testdata_path: Path, subprocess_mock: Subprocess):
+    # arrange
+    assembler = Assembler(subprocess_mock)
+    assembler.add_include_path('lib')
+    expected_path = str(Path.cwd() / Path('lib')).replace('\\', '/')
+    # act
+    assembler.assemble(source_code_path=testdata_path / 'valid_code.s')
 
+    # assert
+    ca65_args: list[str] = subprocess_mock.run.call_args_list[0].args[1]
+    assert f'-I {expected_path}' in " ".join(ca65_args)
+
+def test_assembler_add_absolute_include_path_adds_i_argument_wihout_resolving(testdata_path: Path, subprocess_mock: Subprocess):
+    # arrange
+    assembler = Assembler(subprocess_mock)
+    assembler.add_include_path('H:\\src\\my-6502\\lib')
+
+    # act
+    assembler.assemble(source_code_path=testdata_path / 'valid_code.s')
+
+    # assert
+    ca65_args: list[str] = subprocess_mock.run.call_args_list[0].args[1]
+    assert '-I H:/src/my-6502/lib' in " ".join(ca65_args)
+
+def test_assembler_set_linker_config_file_adds_C_argument(testdata_path: Path, subprocess_mock: Subprocess):
+    # arrange
+    assembler = Assembler(subprocess_mock)
+    assembler.set_config_file('program.map.cfg')
+
+    expected_path = str(Path.cwd() / Path('program.map.cfg')).replace('\\', '/')
+
+    # act
+    assembler.assemble(source_code_path=testdata_path / 'valid_code.s')
+
+    # assert
+    cl65_args: list[str] = subprocess_mock.run.call_args_list[1].args[1]
+    assert f'-C {expected_path}' in " ".join(cl65_args)
+    
 def test_assembler_invalid_file_returns_ca65_error_on_stderr(testdata_path: Path, subprocess_mock: Subprocess):
     # arrange
     expected_error = b'bios.s(3): Error: Unexpected trailing garbage characters'

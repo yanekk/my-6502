@@ -1,6 +1,6 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 
 class SourceCode:
@@ -40,13 +40,22 @@ class SourceCode:
 
 class SourceFile:
     def __init__(self):
+        self.__segment_zero: list[SourceCode] = []
         self.__segments: dict[str, list[SourceCode]] = defaultdict(list)
     
-    def append(self, segment: str, source_code: SourceCode):
-        self.__segments[segment].append(source_code)    
+    def append(self, segment: Optional[str], source_code: SourceCode):
+        if segment:
+            self.__segments[segment].append(source_code)
+            return
+        self.__segment_zero.append(source_code)
 
     def __str__(self) -> str:
         lines = []
+        
+        non_empty_source_codes = [_ for _ in self.__segment_zero if not _.is_empty()]
+        for source_code in non_empty_source_codes:
+            lines.append(str(source_code))
+
         for segment, source_codes in self.__segments.items():
             lines.append(f'  .segment "{segment}"')
             non_empty_source_codes = [_ for _ in source_codes if not _.is_empty()]
