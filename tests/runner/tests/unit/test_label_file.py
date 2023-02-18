@@ -4,7 +4,7 @@ from runner.label_file import Label, LabelFile
 
 def test_parse_label():
     # arrange
-    label_string = 'funcs_high = $FF16'
+    label_string = 'al 00FF16 .funcs_high'
 
     # act
     label = Label.parse(label_string)
@@ -15,9 +15,9 @@ def test_parse_label():
 def test_parse_label_file():
     # arrange
     label_file = """
-funcs_high = $FF16
-funcs_low = $FF0F
-call_subroutine = $FF00
+ al 00FF16 .funcs_high
+ al 00FF0F .funcs_low
+ al 00FF00 .call_subroutine
     """.strip()
 
     # act

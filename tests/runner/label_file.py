@@ -10,8 +10,8 @@ class Label:
 
     @classmethod
     def parse(cls, label_assignment: str):
-        label, address = label_assignment.split(' = $')
-        return Label(label=label, address=int(address, 16))
+        _, address, label = label_assignment.strip().split(' ')
+        return Label(label=label.lstrip('.'), address=int(address, 16))
 
 class LabelFile(UserList[Label]):
     @classmethod
