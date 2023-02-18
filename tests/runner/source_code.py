@@ -43,7 +43,7 @@ class SourceFile:
         self.__segment_zero: list[SourceCode] = []
         self.__segments: dict[str, list[SourceCode]] = defaultdict(list)
     
-    def append(self, segment: Optional[str], source_code: SourceCode):
+    def append(self, source_code: SourceCode, segment: Optional[str] = None):
         if segment:
             self.__segments[segment].append(source_code)
             return
@@ -51,7 +51,7 @@ class SourceFile:
 
     def __str__(self) -> str:
         lines = []
-        
+
         non_empty_source_codes = [_ for _ in self.__segment_zero if not _.is_empty()]
         for source_code in non_empty_source_codes:
             lines.append(str(source_code))
@@ -68,17 +68,17 @@ class FixtureSourceFile:
         self.__source_file = SourceFile()
         
         self.__includes_segment = SourceCode()
-        self.__source_file.append('CODE', self.__includes_segment)
+        self.__source_file.append(self.__includes_segment, 'CODE')
         
         test_start_segment = SourceCode()
         test_start_segment.label(f'{test_name}_start')
-        self.__source_file.append('CODE', test_start_segment)
+        self.__source_file.append(test_start_segment, 'CODE')
 
         self.__variable_assignment_segment = SourceCode()
-        self.__source_file.append('CODE', self.__variable_assignment_segment)
+        self.__source_file.append(self.__variable_assignment_segment, 'CODE')
 
         self.__test_code_segment = SourceCode()
-        self.__source_file.append('CODE', self.__test_code_segment)
+        self.__source_file.append(self.__test_code_segment, 'CODE')
         
         self.__code_segments: list[SourceCode] = [
             self.__includes_segment,
@@ -89,11 +89,11 @@ class FixtureSourceFile:
         test_end_segment = SourceCode()
         test_end_segment.label(self.exit_label)
         test_end_segment.nop()
-        self.__source_file.append('CODE', test_end_segment)
+        self.__source_file.append(test_end_segment, 'CODE')
 
         init_segment = SourceCode()
         init_segment.word(f'{test_name}_start')
-        self.__source_file.append('INIT', init_segment)
+        self.__source_file.append(init_segment, 'INIT')
 
     def assign_variables(self, **variables):
         for variable, value in variables.items():

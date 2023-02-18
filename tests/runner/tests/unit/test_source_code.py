@@ -128,7 +128,7 @@ def test_source_file_stores_source_code_outside_segment():
     source_code.word('label')
 
     # act
-    source_file.append(None, source_code)
+    source_file.append(source_code)
 
     # assert
     assert str(source_file).splitlines() == [
@@ -146,8 +146,8 @@ def test_source_file_stores_source_code_in_segment_after_segment_zero():
     source_code_zero.word('segment_zero_label')
 
     # act
-    source_file.append('INIT', source_code_init)
-    source_file.append(None, source_code_zero)
+    source_file.append(source_code_init, 'INIT')
+    source_file.append(source_code_zero)
 
     # assert
     assert str(source_file).splitlines() == [
@@ -164,7 +164,7 @@ def test_source_file_stores_source_code_in_segment():
     source_code.word('label')
 
     # act
-    source_file.append('INIT', source_code)
+    source_file.append(source_code, 'INIT')
 
     # assert
     assert str(source_file).splitlines() == [
@@ -183,8 +183,8 @@ def test_source_file_stores_multiple_sources_code_in_same_segment():
     irq_handler_source_code.word('irq_handler')
 
     # act
-    source_file.append('INIT', label_source_code)
-    source_file.append('INIT', irq_handler_source_code)
+    source_file.append(label_source_code, 'INIT')
+    source_file.append(irq_handler_source_code, 'INIT')
 
     # assert
     assert str(source_file).splitlines() == [
@@ -203,8 +203,8 @@ def test_source_file_empty_segments_are_ignored():
     irq_handler_source_code.word('irq_handler')
 
     # act
-    source_file.append('INIT', empty_segment)
-    source_file.append('INIT', irq_handler_source_code)
+    source_file.append(empty_segment, 'INIT')
+    source_file.append(irq_handler_source_code, 'INIT')
 
     # assert
     assert str(source_file).splitlines() == [
@@ -223,8 +223,8 @@ def test_source_file_stores_multiple_sources_code_in_different_segment():
     irq_handler_source_code.word('irq_handler')
 
     # act
-    source_file.append('INIT', label_source_code)
-    source_file.append('CODE', irq_handler_source_code)
+    source_file.append(label_source_code, 'INIT')
+    source_file.append(irq_handler_source_code, 'CODE')
 
     # assert
     assert str(source_file).splitlines() == [
