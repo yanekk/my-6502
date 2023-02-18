@@ -1,16 +1,19 @@
 from pathlib import Path
 
 from runner.fixture import FixtureSourceFile, FixtureExecutor
-from runner.assembler import Assembler
+from runner.assembler import Assembler, Linker
 from runner.subprocess import RealSubprocess
 from runner.emulator import Emulator
 
 def test_is_executed():
     # arrange
     emulator = Emulator(RealSubprocess())
+
     assembler = Assembler(RealSubprocess())
     assembler.add_include_path('lib')
-    assembler.set_config_file('tests/runner/assets/test.map.cfg')
+
+    linker = Linker(RealSubprocess())
+    linker.set_config_file('tests/runner/assets/test.map.cfg')
 
     source_code = FixtureSourceFile('actual_test_name')
     source_code.include_code('zeropage.s')
@@ -19,7 +22,7 @@ def test_is_executed():
     source_code.assign_variables(R1=123)
     source_code.jump_to_subroutine('store_r1_into_r3')
     
-    test_executor = FixtureExecutor(assembler, emulator)
+    test_executor = FixtureExecutor(assembler, linker, emulator)
 
     result = test_executor.execute(source_code)
 

@@ -5,7 +5,7 @@ import uuid
 
 from .label_file import LabelFile
 from .source_code import FixtureSourceFile
-from .assembler import Assembler
+from .assembler import Assembler, Linker
 from .emulator import Emulator
 
 class Fixture:
@@ -34,8 +34,9 @@ class FixtureResult:
         return self._memory[self._label_file.address_at(name)]
 
 class FixtureExecutor:
-    def __init__(self, assembler: Assembler, emulator: Emulator):
+    def __init__(self, assembler: Assembler, linker: Linker, emulator: Emulator):
         self.__assembler = assembler
+        self.__linker = linker
         self.__emulator = emulator
 
     def execute(self, source_code: FixtureSourceFile) -> FixtureResult:
@@ -45,12 +46,13 @@ class FixtureExecutor:
             source_file_path = Path(temp_dir) / f'{test_id}.s'
             source_file_path.write_text(str(source_code))
 
-            memory_dump_path = source_file_path.with_suffix('.dmp')
-            self.__assembler.assemble(source_file_path)
+            object_file_path = self.__assembler.assemble(source_file_path)
+            linker_result = self.__linker.link(object_file_path)
 
-            with open(source_file_path.with_suffix('.bin.lmap'), 'rt') as label_file_contents:
+            with open(linker_result.label_file_path, 'rt') as label_file_contents:
                 label_file = LabelFile.parse(label_file_contents)
 
+            memory_dump_path = source_file_path.with_suffix('.dmp')
             self.__emulator.run(
                 memory_dump_path,
                 Path('tests/runner/assets/test.map.cfg'),
