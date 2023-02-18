@@ -54,9 +54,9 @@ class FixtureExecutor:
 
             memory_dump_path = source_file_path.with_suffix('.dmp')
             self.__emulator.run(
+                linker_result.binary_file_path,
                 memory_dump_path,
-                Path('tests/runner/assets/test.map.cfg'),
-                source_code.exit_label)
+                label_file.address_at(source_code.exit_label))
 
             with open(memory_dump_path, 'rb') as memory_dump:
                 return FixtureResult(memory_dump.read(), label_file)

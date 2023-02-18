@@ -17,9 +17,11 @@ def test_is_executed():
 
     source_code = FixtureSourceFile('actual_test_name')
     source_code.include_code('zeropage.s')
+
     memory_dump_path = Path(__file__).parent / 'memory_dump.s'
     source_code.include_code(memory_dump_path)
-    source_code.assign_variables(R1=123)
+
+    source_code.assign_variables(R1=65)
     source_code.jump_to_subroutine('store_r1_into_r3')
     
     test_executor = FixtureExecutor(assembler, linker, emulator)
@@ -27,4 +29,4 @@ def test_is_executed():
     result = test_executor.execute(source_code)
 
     # assert
-    assert result.R3 == 123
+    assert result.R3 == 65

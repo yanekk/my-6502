@@ -15,7 +15,7 @@ class Assembler:
     def assemble(self, source_code_path: Path):
         work_dir = str(source_code_path.parent)
         source_file = source_code_path.name
-        ca65_args = ['--cpu', '65C02']
+        ca65_args = ['-g', '--cpu', '65C02']
 
         object_file_path = source_code_path.with_suffix('.o')
         for include_path in self.__include_paths:
@@ -29,8 +29,8 @@ class Assembler:
         return object_file_path
 @dataclass
 class LinkerResult:
-    binary_file_path: str
-    label_file_path: str
+    binary_file_path: Path
+    label_file_path: Path
     
 class Linker:
     def __init__(self, subprocess: Subprocess):
@@ -47,11 +47,11 @@ class Linker:
             cl65_args += ['-C', self.__config_file]
 
         result = LinkerResult(
-            binary_file_path=str(object_file_path.with_suffix('.bin')),
-            label_file_path=str(object_file_path.with_suffix('.bin.lmap'))
+            binary_file_path=object_file_path.with_suffix('.bin'),
+            label_file_path=object_file_path.with_suffix('.bin.lmap')
         )
 
-        cl65_args += ['-t', 'none', '-Ln', result.label_file_path, '-o', result.binary_file_path, str(object_file_path)]
+        cl65_args += ['-t', 'none', '-Ln', str(result.label_file_path), '-o', str(result.binary_file_path), str(object_file_path)]
         completed_process = self.__subprocess.run('cl65', cl65_args)
         if has_subprocess_failed(completed_process):
             raise subprocess_execution_error('cl65', completed_process)

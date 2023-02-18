@@ -20,13 +20,13 @@ def test_emulator_command_arguments_are_passed_correctly(subprocess_mock: MagicM
 
     rom_file_path = Path('./bin/bios.bin')
     memory_dump_path = Path('memory.dmp')
-    exit_label = 'breakpoint_test'
+    exit_address = 0x1234
 
     # act
     emulator.run(
         rom_file_path=rom_file_path,
         memory_dump_path=memory_dump_path,
-        exit_label=exit_label
+        exit_address=exit_address
     )
  
     # assert
@@ -36,7 +36,7 @@ def test_emulator_command_arguments_are_passed_correctly(subprocess_mock: MagicM
         [
             '--rom', str(rom_file_path), 
             '--dump-memory-on-exit', 'memory.dmp', 
-            '--exit-label', 'breakpoint_test'
+            '--exit-address', '1234'
         ]
     )
 
@@ -51,14 +51,14 @@ def test_emulator_command_raises_execution_error_on_nonzero_returncode(subproces
 
     rom_file_path = Path('./bin/bios.bin')
     memory_dump_path = Path('memory.dmp')
-    exit_label = 'breakpoint_test'
+    exit_address = 0x1234
 
     # act
     with pytest.raises(ExecutionError) as execution_error:
         emulator.run(
             rom_file_path=rom_file_path,
             memory_dump_path=memory_dump_path,
-            exit_label=exit_label
+            exit_address=exit_address
         )
  
     # assert
@@ -66,7 +66,7 @@ def test_emulator_command_raises_execution_error_on_nonzero_returncode(subproces
     assert execution_error.value.command_args == [
             '--rom', str(rom_file_path), 
             '--dump-memory-on-exit', 'memory.dmp', 
-            '--exit-label', 'breakpoint_test'
+            '--exit-address', '1234'
         ]
     assert execution_error.value.return_code == 123    
     assert execution_error.value.stderr == ''
@@ -82,14 +82,13 @@ def test_emulator_command_raises_execution_error_on_nonempty_stderr(subprocess_m
 
     rom_file_path = Path('./bin/bios.bin')
     memory_dump_path = Path('memory.dmp')
-    exit_label = 'breakpoint_test'
 
     # act
     with pytest.raises(ExecutionError) as execution_error:
         emulator.run(
             rom_file_path=rom_file_path,
             memory_dump_path=memory_dump_path,
-            exit_label=exit_label
+            exit_address=0x1234
         )
  
     # assert
@@ -97,7 +96,7 @@ def test_emulator_command_raises_execution_error_on_nonempty_stderr(subprocess_m
     assert execution_error.value.command_args == [
             '--rom', str(rom_file_path), 
             '--dump-memory-on-exit', 'memory.dmp', 
-            '--exit-label', 'breakpoint_test'
+            '--exit-address', '1234'
         ]
     assert execution_error.value.return_code == 0    
     assert execution_error.value.stderr == 'abcd'

@@ -14,7 +14,6 @@ class RealSubprocess:
         kwargs = {}
         if work_dir:
             kwargs['cwd'] = work_dir
-
         return subprocess.run([command] + args, capture_output=True, **kwargs)
 
 

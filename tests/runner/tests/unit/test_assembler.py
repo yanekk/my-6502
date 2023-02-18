@@ -33,7 +33,7 @@ def test_assembler_valid_file_ca65_returns_no_error(testdata_path: Path, subproc
 
     # assert
     subprocess_mock.run.assert_called_once_with('ca65', 
-        ['--cpu', '65C02',  '-o', str(source_code_path.with_suffix('.o')), source_code_path.name], str(source_code_path.parent))
+        ['-g', '--cpu', '65C02',  '-o', str(source_code_path.with_suffix('.o')), source_code_path.name], str(source_code_path.parent))
 
 def test_assembler_valid_file_ca65_returns_object_file(testdata_path: Path, subprocess_mock: Subprocess):
     # arrange
@@ -69,8 +69,8 @@ def test_linker_valid_file_cl65_returns_result(testdata_path: Path, subprocess_m
     result = assembler.link(object_file_path=object_file_path)
 
     # assert
-    assert result.binary_file_path == str(object_file_path.with_suffix('.bin'))
-    assert result.label_file_path == str(object_file_path.with_suffix('.bin.lmap'))
+    assert result.binary_file_path == object_file_path.with_suffix('.bin')
+    assert result.label_file_path == object_file_path.with_suffix('.bin.lmap')
 
 def test_assembler_add_include_relative_path_adds_i_argument_with_resolved_path(testdata_path: Path, subprocess_mock: Subprocess):
     # arrange
@@ -128,7 +128,7 @@ def test_assembler_invalid_file_returns_ca65_error_on_stderr(testdata_path: Path
 
     # assert
     assert assembly_error.value.command == 'ca65'
-    assert assembly_error.value.command_args == ['--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), str(source_code_path.name)]
+    assert assembly_error.value.command_args == ['-g', '--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), str(source_code_path.name)]
     assert assembly_error.value.return_code == 123    
     assert assembly_error.value.stderr == expected_error.decode()
 
@@ -150,7 +150,7 @@ def test_assembler_invalid_file_returns_ca65_error_on_nonzero_returncode(testdat
 
     # assert
     assert assembly_error.value.command == 'ca65'
-    assert assembly_error.value.command_args == ['--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), str(source_code_path.name)]
+    assert assembly_error.value.command_args == ['-g', '--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), str(source_code_path.name)]
     assert assembly_error.value.return_code == 123    
     assert assembly_error.value.stderr == ''
 
