@@ -68,7 +68,7 @@ class FixtureSourceFile:
         self.__source_file = SourceFile()
         
         self.__includes_segment = SourceCode()
-        self.__source_file.append(self.__includes_segment, 'CODE')
+        self.__source_file.append(self.__includes_segment)
         
         test_start_segment = SourceCode()
         test_start_segment.label(f'{test_name}_start')

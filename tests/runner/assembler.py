@@ -32,7 +32,7 @@ class Assembler:
         if self.__config_file:
             cl65_args += ['-C', self.__config_file]
 
-        cl65_args += ['-t', 'none', '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))]
+        cl65_args += ['-t', 'none', '-Ln', str(source_code_path.with_suffix('.bin.lmap')), '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))]
         completed_process = self.__subprocess.run('cl65', cl65_args)
         if has_subprocess_failed(completed_process):
             raise subprocess_execution_error('cl65', completed_process)

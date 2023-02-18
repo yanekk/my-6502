@@ -298,9 +298,9 @@ def test_fixture_source_file_includes_are_at_the_top():
     
     # assert
     assert str(fixture_source_file).splitlines() == [
-        '  .segment "CODE"',
         '  .include "./common/zeropage.s"',
         '  .include "./via/via.s"',
+        '  .segment "CODE"',
         'test_name_start:',
         '  LDA #$12',
         '  STA R1',

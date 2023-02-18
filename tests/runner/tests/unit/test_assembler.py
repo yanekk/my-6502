@@ -34,8 +34,8 @@ def test_assembler_valid_file_ca65_returns_no_error(testdata_path: Path, subproc
     # assert
     assert subprocess_mock.run.call_count == 2
     subprocess_mock.run.assert_has_calls([
-        call('ca65', ['--cpu', '65C02', '-o', str(source_code_path.with_suffix('.o')), source_code_path.name], str(source_code_path.parent)),
-        call('cl65', ['-t', 'none',  '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))])
+        call('ca65', ['--cpu', '65C02',  '-o', str(source_code_path.with_suffix('.o')), source_code_path.name], str(source_code_path.parent)),
+        call('cl65', ['-t', 'none', '-Ln', str(source_code_path.with_suffix('.bin.lmap')), '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))])
     ])
 
 def test_assembler_add_include_relative_path_adds_i_argument_with_resolved_path(testdata_path: Path, subprocess_mock: Subprocess):
@@ -142,7 +142,7 @@ def test_assembler_invalid_file_returns_cl65_error_on_nonzero_returncode(testdat
 
     # assert
     assert assembly_error.value.command == 'cl65'
-    assert assembly_error.value.command_args == ['-t', 'none', '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))]
+    assert assembly_error.value.command_args == ['-t', 'none', '-Ln', str(source_code_path.with_suffix('.bin.lmap')), '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))]
     assert assembly_error.value.return_code == 123    
     assert assembly_error.value.stderr == ''
 
@@ -167,6 +167,6 @@ def test_assembler_invalid_file_returns_cl65_error_on_stderr(testdata_path: Path
 
     # assert
     assert assembly_error.value.command == 'cl65'
-    assert assembly_error.value.command_args == ['-t', 'none', '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))]
+    assert assembly_error.value.command_args == ['-t', 'none', '-Ln', str(source_code_path.with_suffix('.bin.lmap')), '-o', str(source_code_path.with_suffix('.bin')), str(source_code_path.with_suffix('.o'))]
     assert assembly_error.value.return_code == 123    
     assert assembly_error.value.stderr == expected_error.decode()
